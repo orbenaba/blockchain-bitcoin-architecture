@@ -1,5 +1,7 @@
 //Adding rewards for miners
-const {Block,Blockchain, Transaction} = require('./Blockchain4.js');
+const {Blockchain} = require('./Blockchain.js');
+const {Block} = require('./Block.js');
+const {Transaction} = require('./Transaction');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 

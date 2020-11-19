@@ -1,44 +1,11 @@
 const SHA256 = require('crypto-js/sha256');
+const { curve } = require('elliptic');
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
+const {Block} = require('./Block');
+const {Transaction} = require('./Transaction');
 
-class Transaction{
-    //Note that in Monero coin those data is not known
-    constructor(fromAddress, toAddress,amount){
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
-        this.amount = amount;
-    }
 
-}
-
-class Block{
-    //Attributes:
-    //index of the block
-    //timestamp
-    //data of the block
-    //previous hash - default value for the first block
-    //hash = current hash which is calculated by the relevant values
-    constructor(timeStamp,transaction,prevHash=''){
-        this.timeStamp = timeStamp;
-        this.transaction = transaction;
-        this.prevHash = prevHash;
-        this.hash = this.calculateHash();
-        //Using nonce for mining, by manipulating its value
-        this.nonce = 0;
-    }
-
-    calculateHash(){
-        return SHA256(this.prevHash+this.timeStamp+JSON.stringify(this.transaction)+this.nonce).toString();
-    }
-    //In real life, the difficulty is changed every two weeks
-    mineBlock(difficulty){
-        //Comparing the hash with a string that composed by "difficulty+1" zeros
-        let padding = '0'.repeat(difficulty);
-        while(this.hash.substr(0,difficulty)!==padding){
-            this.nonce ++;
-            this.hash = this.calculateHash();
-        }
-    }
-}
 
 class Blockchain{
     constructor(){
@@ -75,7 +42,15 @@ class Blockchain{
         // Composing a lot of transactions in one block - not in real scenario
         this.pendingTransactions = [];
     }
-    createTransaction(transaction){
+    //Add transaction
+    addTransaction(transaction){
+        //first Verify
+        if(!transaction.fromAddress || !transaction.toAddress){
+            throw new Error("[-] Transaction must include fromAddress and toAddress fields!");
+        }
+        if(!transaction.isValid()){
+            throw new Error("[-] Can't add invalid transaction to the chain");
+        }
         this.pendingTransactions.push(transaction);
     }
 
@@ -100,11 +75,14 @@ class Blockchain{
 
     //Validate the chain
     //To deny attempts for harsh
-    isValid(){
+    isChainValid(){
         let len = this.chain.length;
         for(let i=1;i < len;i++){
             const curBlock  = this.chain[i];
             const prevBlock = this.chain[i-1];
+            if(!curBlock.hasValidTransactions()){
+                return false;
+            }
             //Validate that no one change the values
             if(curBlock.hash !== curBlock.calculateHash()){
                 console.log(`1) Check blocks ${i}, ${i-1}`);
@@ -120,6 +98,4 @@ class Blockchain{
 }
 
 //Exporting the modules in this file to make them available to the rest of the world
-module.exports.Block = Block;
 module.exports.Blockchain = Blockchain;
-module.exports.Transaction = Transaction;
