@@ -41,18 +41,20 @@ class MerkleTree{
         if(someNode === null){
             return null;
         }
-        if(someNode.rightNode === null && someNode.leftNode === null){
-            return someNode;
+        let q = new Queue();
+        q.push(someNode)
+        while(q.length > 0){
+            let poped = q.pop();
+            if(poped.leftNode === null && poped.rightNode === null){
+                return poped;
+            }
+            if(poped.leftNode !== null){
+                q.push(poped.leftNode);
+            }
+            if(poped.rightNode !== null){
+                q.push(poped.rightNode);
+            }
         }
-        if(someNode.rightNode === null && someNode.leftNode !== null || someNode.rightNode !== null && someNode.leftNode === null){
-            return someNode;
-        }
-        // someNode.rightNode !=null && someNode.leftNode != null
-        let node = this.upperNode(someNode.leftNode)
-        if(node !== null){
-            return node;
-        }
-        return this.upperNode(someNode.rightNode);
     }
     //temp function
     printTree()
