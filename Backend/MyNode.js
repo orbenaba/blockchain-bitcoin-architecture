@@ -10,6 +10,9 @@ class MyNode
             this.hashedTX = TX;
         }
         else{
+            if(!TX instanceof Transaction){
+                throw new Error("Failed !")
+            }
             this.hashedTX = TX.calculateHash();
         }
         this.leftNode= leftNode;
