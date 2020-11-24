@@ -20,12 +20,15 @@ const sockets = {}
 console.log("\x1b[32m")
 log('---------------------')
 log('Welcome to j00k3r coin!')
+log('The most secured distributed coin!!1')
 log('me - ', me)
 log('peers - ', peers)
 log('connecting to peers...')
 
 const myIp = toLocalIp(me)
 const peerIps = getPeerIps(peers)
+
+
 
 //connect to peers
 topology(myIp, peerIps).on('connection', (socket, peerIp) => {
