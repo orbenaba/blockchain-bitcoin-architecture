@@ -3,15 +3,15 @@ const { SHA256 } = require("crypto-js");
 
 class MyNode
 {
-    // choise is used to differentiate between the two ctors
-    constructor(TX , choise = 0, leftNode = null, rightNode = null)
+    // choice is used to differentiate between the two ctors
+    constructor(TX , choice = 0, leftNode = null, rightNode = null)
     {
-        if(choise !== 0){
+        if(choice !== 0){
             this.hashedTX = TX;
         }
         else{
             if(!TX instanceof Transaction){
-                throw new Error("Failed !")
+                throw new Error("Failed in creating a node for new Transaction!")
             }
             this.hashedTX = TX.calculateHash();
         }
