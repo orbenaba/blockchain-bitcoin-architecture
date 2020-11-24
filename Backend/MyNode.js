@@ -1,4 +1,4 @@
-const {Transaction} = require("./Transaction");
+const {Transaction} = require('./Transaction');
 const { SHA256 } = require("crypto-js");
 
 class MyNode
@@ -10,10 +10,12 @@ class MyNode
             this.hashedTX = TX;
         }
         else{
-            if(!TX instanceof Transaction){
+            if(!(TX instanceof Transaction)){
                 throw new Error("Failed in creating a node for new Transaction!")
             }
-            this.hashedTX = TX.calculateHash();
+            else{
+                this.hashedTX = TX.calculateHash()
+            }
         }
         this.leftNode= leftNode;
         this.rightNode = rightNode;

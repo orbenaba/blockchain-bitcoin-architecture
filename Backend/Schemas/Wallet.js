@@ -46,7 +46,8 @@ function removePairOfKeys(pubKey, priKey){
 function removeAllKeys(){
     //{} means ALL
     KeysSchema.remove({},(err)=>{
-        return console.error("Error removing all the rows in the schema ...");
+        if(err)
+            return console.error("Error removing all the rows in the schema ...");
     })
 }
 

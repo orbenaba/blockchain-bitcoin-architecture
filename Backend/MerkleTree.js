@@ -1,21 +1,31 @@
 const { SHA256 } = require('crypto-js');
 const {MyNode} = require('./MyNode');
 const {default: Queue} = require('queue');
-const { PartitionedBloomFilter} = require('bloom-filters');
+const {Transaction } = require('./Transaction');
 //This tree contains multiple transactions in a complete binary-hashed tree
 
 class MerkleTree{
-    //root is the node that holds the tree, Transaction is given in ctor
-    //Bloom filter array is used to find quickly transactions but might invoke false positive alerts
-    constructor(TX){
-        this.root = new MyNode(TX);
-        //512 -size of bit array
-        //256 - number of elements to be inserted
-        this.bloomFilter = new PartitionedBloomFilter(2048, 1024);
-        this.bloomFilter.add(this.root.hashedTX);
+    /**
+     *  Transaction is given in ctor
+     * @param {*when 1 -> hash of TX had already calculated
+     *               0-> hash of TX had not calculated yet.} choice
+     * @param {*Transaction} TX
+     * @var {*the node that holds the tree} root 
+     */
+    constructor(TX, choice = 0){
+        this.root = new MyNode(TX, choice);
     }
-    addTransaction(addedTX)
+    addTransaction(added)
     {
+        let addedTX = null;
+        if(added instanceof Transaction){
+            addedTX = added.calculateHash();
+        }
+        else{
+            //else, the transaction already been hashed
+            addedTX = added;
+        }
+        
         //place: the node to which we need to add the new hash
         let place = this.findApproPlace(this.root);
         //Go to the most left leave
@@ -25,8 +35,7 @@ class MerkleTree{
             }
         }
         //At this point, we have a targeted node we can insert to it the new hash
-        let inserted = new MyNode(addedTX);
-        this.bloomFilter.add(inserted.hashedTX);
+        let inserted = new MyNode(addedTX, 1);
         //if there are no nodes on the tree
         if(place === null){
             this.root = inserted;
@@ -89,15 +98,17 @@ class MerkleTree{
             }
         }
     }
-
     /**
-     * check if some TX exist in the Merkle tree by checking the bloom-filter array
-     * Warning: False positive alerts might invoked !
+     * Returning the amount of transactions in the tree
      */
-    hasTX(someTX){
-        let temp = new MyNode(someTX);
-        console.log(temp.hashedTX);
-        return this.bloomFilter.has(temp.hashedTX);
+    static getAmountOfTX(root){
+        if(root === null){
+            return 0;
+        }
+        if(root.leftNode === null && root.rightNode === null){
+            return 1;
+        }
+        return this.getAmountOfTX(root.leftNode) + this.getAmountOfTX(root.rightNode);
     }
 }
 
