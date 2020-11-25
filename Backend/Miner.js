@@ -8,7 +8,6 @@ class Miner extends WalletSPV{
      * @param {*Each miner as a pointer to the blockchain} blockchain
      * it is intended to be a shared resource !!!
      */
-
      constructor(blockchain){
         super();
         this.blockchain = blockchain;

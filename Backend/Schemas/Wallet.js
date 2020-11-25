@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+//customized
+const db = require('./keysToRemote').MongoURI;
+
+//Connecting the DB
+mongoose.connect(db, {useNewUrlParser: true})
+.then('[+] MongoDB connected ...')
+.catch(err=> console.error(err));
 
 //Keys schema
 const KeysSchema = mongoose.Schema({

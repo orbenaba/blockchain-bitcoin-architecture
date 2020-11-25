@@ -1,7 +1,3 @@
-const SHA256 = require('crypto-js/sha256');
-const { curve } = require('elliptic');
-const EC = require('elliptic').ec;
-const ec = new EC('secp256k1');
 const {Block} = require('./Block');
 const {Transaction} = require('./Transaction');
 
@@ -42,7 +38,7 @@ class Blockchain{
         // Composing a lot of transactions in one block - not in real scenario
         this.pendingTransactions = [];
     }
-    //Add transaction
+
     addTransaction(transaction){
         //first Verify
         if(!transaction.fromAddress || !transaction.toAddress){
@@ -85,11 +81,9 @@ class Blockchain{
             }
             //Validate that no one change the values
             if(curBlock.hash !== curBlock.calculateHash()){
-                console.log(`1) Check blocks ${i}, ${i-1}`);
                 return false;
             }
             if(curBlock.prevHash !== prevBlock.hash){
-                console.log(`2) Check blocks ${i}, ${i-1}`);
                 return false;
             }
         }
@@ -97,5 +91,4 @@ class Blockchain{
     }
 }
 
-//Exporting the modules in this file to make them available to the rest of the world
 module.exports.Blockchain = Blockchain;
