@@ -1,5 +1,4 @@
 const {Transaction} = require('./Transaction');
-const { SHA256 } = require("crypto-js");
 
 class MyNode
 {
