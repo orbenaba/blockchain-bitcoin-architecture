@@ -4,7 +4,6 @@ const ec = new EC('secp256k1');
 const { PartitionedBloomFilter} = require('bloom-filters');
 
 // mine
-const {Transaction} = require('./Transaction');
 const {MerkleTree } = require('./MerkleTree');
 
 class Block{
