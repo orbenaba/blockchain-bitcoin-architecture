@@ -3,6 +3,7 @@ const WalletSPV = require('./WalletSPV').WalletSPV;
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
+
 class Transaction{
       //Note that in Monero coin those data is not known
       constructor(fromAddress, toAddress,amount){

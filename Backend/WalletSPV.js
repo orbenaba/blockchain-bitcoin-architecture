@@ -10,11 +10,16 @@ class WalletSPV{
      * @var {*At first all wallets are initialize to 0} amountOfMoney
      */
     constructor(amountOfMoney){
-        const pair = Wallet.addNewKeys();
-        console.log("pair = ",pair);
-        this.publicKey = pair.publicKey;
-        this.privateKey = pair.privateKey;
-        this.amountOfMoney = amountOfMoney;
+        const pair = Wallet.addNewKeys()
+                            .then((res)=>{
+                                this.publicKey = pair.publicKey;
+                                this.privateKey = pair.privateKey;
+                                this.amountOfMoney = amountOfMoney;
+                                console.log("\n\n",this.publicKey,"\n\n",this.privateKey,"\n\n",this.amountOfMoney,"\n\n")
+                            })
+                            .catch((err)=>{
+                                console.error("Error, adding keys ...");
+                            })
     }
     static async WalletCreator(amountOfMoney = 0){
         const wlt = await new WalletSPV(amountOfMoney);

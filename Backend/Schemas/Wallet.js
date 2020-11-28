@@ -1,13 +1,7 @@
 const mongoose = require('mongoose');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
-//customized
-const db = require('./keysToRemote').MongoURI;
 
-//Connecting the DB
-mongoose.connect(db, {useNewUrlParser: true})
-.then(console.log('[+] MongoDB connected ...'))
-.catch(err=> console.error(err));
 
 //Keys schema
 const KeysSchema = new mongoose.Schema({
@@ -29,14 +23,15 @@ async function addNewKeys(){
     const genKeys = ec.genKeyPair();
     const publicKey = genKeys.getPublic('hex');
     const privateKey = genKeys.getPrivate('hex');
-    let pair = await new Keys({publicKey, privateKey});
-    await pair.save(function (err, inserted){
-        console.log("nicdxiosxoia");
-        if(err){
-            throw new Error("Error in saving the keys on schema ...");
-        }
-        return [publicKey, privateKey];
-    })
+    let pair = new Keys({publicKey, privateKey});
+    pair.save()
+        .then(item =>{
+            console.log("Data saved in DB !");
+            return pair;
+        })
+        .catch(err =>{
+            console.error("Error in saving the Data ...");
+        })
 }
 
 //Removing set of keys from the schema
