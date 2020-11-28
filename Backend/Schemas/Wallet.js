@@ -6,18 +6,18 @@ const db = require('./keysToRemote').MongoURI;
 
 //Connecting the DB
 mongoose.connect(db, {useNewUrlParser: true})
-.then('[+] MongoDB connected ...')
+.then(console.log('[+] MongoDB connected ...'))
 .catch(err=> console.error(err));
 
 //Keys schema
-const KeysSchema = mongoose.Schema({
+const KeysSchema = new mongoose.Schema({
     publicKey:{
         type: String,
-        required
+        required: true
     },
     privateKey:{
         type: String,
-        required
+        required: true
     }
 })
 const Keys = mongoose.model('Keys', KeysSchema);
@@ -25,16 +25,17 @@ const Keys = mongoose.model('Keys', KeysSchema);
 //Basic functions to use with the DB
 
 //Generating pair of keys and inserting, returning em
-function addNewKeys(){
+async function addNewKeys(){
     const genKeys = ec.genKeyPair();
     const publicKey = genKeys.getPublic('hex');
     const privateKey = genKeys.getPrivate('hex');
-    const pair = new Keys({publicKey, privateKey});
-    pair.save((err, inserted)=>{
+    let pair = await new Keys({publicKey, privateKey});
+    await pair.save(function (err, inserted){
+        console.log("nicdxiosxoia");
         if(err){
-            return console.error("Error in saving the keys on schema ...");
+            throw new Error("Error in saving the keys on schema ...");
         }
-        return inserted;
+        return [publicKey, privateKey];
     })
 }
 

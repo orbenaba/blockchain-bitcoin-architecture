@@ -1,6 +1,8 @@
 const {Block} = require('./Block');
 const {Transaction} = require('./Transaction');
 const {MerkleTree} = require('./MerkleTree');
+const {Miner} = require('./Miner');
+
 //Might be changed with some reasons
 var REWARD = 100;
 
@@ -25,7 +27,7 @@ class Blockchain{
      * It has only one transaction ! ! !
      */
     createGenesisBlock(){
-        return new Block("01/01/2020","Genesis block","o");
+        return new Block("01/01/2020",new Transaction("Genesis block","Genesis block",0),"o");
     }
 
     //get the last block in the blockchain
@@ -39,6 +41,10 @@ class Blockchain{
      * so when the miner signed a transaction he get a reward which also written to the block
      */
     miningPendingTransactions(minerAddress){
+        if(minerAddress instanceof Miner){
+            minerAddress = minerAddress.publicKey;
+        }
+        
         // Transaction which committed by the miner to the miner: null->miningRewardAddress
         const rewardTX = new Transaction(null, minerAddress, this.miningReward);
         const inserted = this.pendingTransactions[0];
@@ -134,4 +140,4 @@ class Blockchain{
     }
 }
 
-module.exports.Blockchain = Blockchain;
+module.exports = Blockchain;

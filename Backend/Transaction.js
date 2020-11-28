@@ -1,13 +1,23 @@
 const SHA256 = require('crypto-js/sha256');
-const { curve } = require('elliptic');
+const WalletSPV = require('./WalletSPV').WalletSPV;
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
 class Transaction{
       //Note that in Monero coin those data is not known
       constructor(fromAddress, toAddress,amount){
-          this.fromAddress = fromAddress;
-          this.toAddress = toAddress;
+          if(fromAddress instanceof WalletSPV){
+              this.fromAddress = fromAddress.publicKey;
+          }
+          else{
+            this.fromAddress = fromAddress;
+          }
+          if(toAddress instanceof WalletSPV){
+              this.toAddress = toAddress.publicKey;
+          }
+          else{
+            this.toAddress = toAddress;
+          }
           this.amount = amount;
           this.timeStamp = Date.now();
       }
@@ -36,6 +46,7 @@ class Transaction{
               return true;
           }
           if(!this.signature || this.signature === 0){
+              console.log(this.signature);
               throw new Error("There is no signature for this transaction");
           }
           const publicKey = ec.keyFromPublic(this.fromAddress,'hex');

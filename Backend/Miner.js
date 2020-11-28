@@ -1,5 +1,5 @@
-const WalletSPV = require('./WalletSPV');
-const BlockChain = require('./BlockChain');
+const WalletSPV = require('./WalletSPV').WalletSPV;
+const Blockchain = require('./Blockchain');
 
 
 class Miner extends WalletSPV{
@@ -10,6 +10,13 @@ class Miner extends WalletSPV{
      */
      constructor(blockchain){
         super();
-        this.blockchain = blockchain;
+        if(blockchain instanceof Blockchain){
+            this.blockchain = blockchain;
+        }
+        else{
+            throw new Error("Miner should receive a pointer to the blockchain")
+        }
     }
 }
+
+module.exports = {Miner};

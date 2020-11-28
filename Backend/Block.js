@@ -5,6 +5,7 @@ const { PartitionedBloomFilter} = require('bloom-filters');
 
 // mine
 const {MerkleTree } = require('./MerkleTree');
+const {Transaction} = require('./Transaction');
 
 class Block{
     /**
@@ -18,12 +19,19 @@ class Block{
      * @var {*used for disqualify the fact that a transaction is not in the merkle tree
      * , might invoke false positive alerts} bloomFilter
      */
-    constructor(timeStamp,transaction,prevHash=''){
+    constructor(timeStamp, transaction,prevHash=''){
+        let hashedTX = null;
+        if(transaction instanceof Transaction){
+            hashedTX = transaction.calculateHash();
+        }
+        else{
+            throw new Error("A transaction must be first passed for block ...")
+        }
+
         this.timeStamp = timeStamp;
         this.prevHash = prevHash;
         this.hash = this.calculateHash(transaction);
         this.nonce = 0;
-        const hashedTX = transaction.calculateHash();
         this.merkleTree = new MerkleTree(hashedTX, 1);
         //2048 -size of bit array
         //1024 - number of elements to be inserted

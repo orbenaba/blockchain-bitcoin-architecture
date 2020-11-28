@@ -9,12 +9,18 @@ class WalletSPV{
      * @var {*The address which used no navigate to the user} publicKey
      * @var {*At first all wallets are initialize to 0} amountOfMoney
      */
-    constructor(amountOfMoney = 0){
-        const {pubKey, priKey} = Wallet.addNewKeys();
-        this.publicKey = pubKey;
-        this.privateKey = priKey;
+    constructor(amountOfMoney){
+        const pair = Wallet.addNewKeys();
+        console.log("pair = ",pair);
+        this.publicKey = pair.publicKey;
+        this.privateKey = pair.privateKey;
         this.amountOfMoney = amountOfMoney;
+    }
+    static async WalletCreator(amountOfMoney = 0){
+        const wlt = await new WalletSPV(amountOfMoney);
+        return wlt;
     }
 }
 
-module.exports = WalletSPV;
+module.exports.WalletSPV = WalletSPV;
+module.exports.WalletCreator = WalletSPV.WalletCreator;
