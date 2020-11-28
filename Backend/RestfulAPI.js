@@ -1,8 +1,10 @@
 const express = require('express');
 const app = express();
+const router = express.Router();
 
 //Routes
-app.use('/',require('../Backend/index.html'));
+router.get('/',(req,res)=>res.send('index.html'));
+
 
 
 //connecting the server
