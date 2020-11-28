@@ -1,4 +1,6 @@
 const WalletSPV = require('./WalletSPV').WalletSPV;
+const WalletCreator = require('./WalletSPV').WalletCreator;
+
 const Blockchain = require('./Blockchain');
 
 
@@ -17,6 +19,13 @@ class Miner extends WalletSPV{
             throw new Error("Miner should receive a pointer to the blockchain")
         }
     }
+    
+    static async MinerCreator(blockchain){
+        let miner = await new Miner(blockchain);
+        miner.WalletSPV = await WalletSPV.WalletCreator();
+        return miner;
+    }
 }
 
-module.exports = {Miner};
+module.exports.Miner = Miner;
+module.exports.MinerCreator = Miner.MinerCreator;
