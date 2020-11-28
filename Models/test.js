@@ -1,14 +1,12 @@
 const WalletSPV = require('./WalletSPV').WalletSPV;
-const WalletCreator = require('./WalletSPV').WalletCreator;
 const Miner = require('./Miner');
-const MinerCreator = require('./Miner').MinerCreator;
 const Blockchain = require('./Blockchain');
 const { Transaction } = require('./Transaction');
 const mongoose = require('mongoose');
 
 
 //customized
-const db = require('./Schemas/keysToRemote').MongoURI;
+const db = require('../Schemas/keysToRemote').MongoURI;
 
 //Connecting the DB
 mongoose.connect(db, {useNewUrlParser: true})

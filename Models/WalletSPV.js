@@ -1,4 +1,4 @@
-const Wallet = require('./Schemas/Wallet');
+const Wallet = require('../Schemas/Wallet');
 
 class WalletSPV{
     /**
