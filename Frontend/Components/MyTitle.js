@@ -4,7 +4,7 @@
 
 import React from 'react'
 
-export default function Title() {
+export default function MyTitle() {
     return (
         <div>
             <h1>j00k3r c0in</h1>

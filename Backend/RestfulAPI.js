@@ -14,7 +14,7 @@ mongoose.connect(db, {useNewUrlParser: true})
 
 //Routes
 //Main page
-router.get('/',(req,res)=>res.send('index.html'));
+router.get('/',(req,res)=>res.send('../frontend/public/index.html'));
 
 /**
  * Add user path

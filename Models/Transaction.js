@@ -55,4 +55,4 @@ class Transaction{
           return publicKey.verify(this.calculateHash(), this.signature);
       }
 }
-module.exports.Transaction = Transaction;
+module.exports = Transaction;
