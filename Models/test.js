@@ -2,9 +2,9 @@ const WalletSPV = require('./WalletSPV').WalletSPV;
 const Miner = require('./Miner');
 const Blockchain = require('./Blockchain');
 const { Transaction } = require('./Transaction');
+
+
 const mongoose = require('mongoose');
-
-
 //customized
 const db = require('../Schemas/keysToRemote').MongoURI;
 
