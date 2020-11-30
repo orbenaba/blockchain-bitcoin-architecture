@@ -12,9 +12,10 @@ export default class Transaction extends Component {
     constructor(props)
     {
         super(props);
+        const {toAddress, fromAddress, amount } = props;
         this.state = {
             //dummy values
-            tran: new TX("2.2.2.2","1.1.1.1", 1000)
+            tran: new TX(toAddress,fromAddress, amount)
         }
     }
     render() {

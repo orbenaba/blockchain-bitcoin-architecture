@@ -110,6 +110,24 @@ class MerkleTree{
         }
         return this.getAmountOfTX(root.leftNode) + this.getAmountOfTX(root.rightNode);
     }
+
+    treeToArray(){
+        let q = new Queue();
+        let arr = [];
+        q.push(this.root);
+        while(q.length > 0){
+            let poped = q.pop();
+            arr.push(poped);
+            if(poped.leftNode !== null){
+                q.push(poped.leftNode);
+            }
+            if(poped.rightNode !== null){
+                q.push(poped.rightNode);
+            }
+        }
+        return arr;
+    }
+
 }
 
 module.exports.MerkleTree = MerkleTree;

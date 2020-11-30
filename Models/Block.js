@@ -81,6 +81,7 @@ class Block{
             return console.error("Cannot add more than 4 transactions per block ...");
         }
     }
+
 }
 
 
