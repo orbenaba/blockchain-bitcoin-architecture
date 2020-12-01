@@ -1,7 +1,7 @@
 const express = require('express');
 const Users = require('../../Schemas/Users');
 const Transactions = require('../../Schemas/Transactions');
-const { Router } = require('express');
+const Miners = require('../../Schemas/Miners');
 
 
 function routes(app){
@@ -55,6 +55,21 @@ function routes(app){
         }
     });
     /**
+     * Singleton pattern, we use only one miner
+     * Displaying the miner in the DB
+     */
+    router.get('/miner',async (req,res)=>{
+        //Loading everything from the transactions Schema and send it as a response
+        const data = await Miners.displayAll();
+        if(data == null){
+            res.send({message:'No Miners'})
+        }
+        else{
+            console.log('All transactions sent back ...');
+            res.send(data);
+        }
+    });
+    /**
      * <----------- POST REQUESTS ----------->
      */
     //Adding new transaction
@@ -88,6 +103,22 @@ function routes(app){
         }
     })
 
+    //Adding new miner
+    router.post('/miner', (req,res)=>{
+        //Validating the request
+        if(!req.body.name){
+            res.status(400).send({message: "You must give a name to the miner !"});
+        }
+        else{
+            /**
+             * Saving a TX
+             * Note that [publicKey, privateKey] is generated and saved automatically
+             */
+            Miners.addMiner(req.body.name)
+            res.send({message:'Miner added successfully !!!'})
+        }
+    })
+
 
     /**
      * <----------- DELETE REQUESTS ----------->
@@ -114,6 +145,18 @@ function routes(app){
             console.error('[-] Error occurred while deleting Users ...');
         }
     })
+
+    router.delete('/miner',(req,res)=>{
+        try{
+            Miners.removeAll();
+            console.log('[+] All data removed from Miners schema !');
+            res.send({message: 'Miners\' rows deleted' })
+        }
+        catch(err){
+            console.error('[-] Error occurred while deleting Miners ...');
+        }
+    })
+
 
     //Externalizing the created API to the app
     app.use('/',router);
