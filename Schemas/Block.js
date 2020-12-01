@@ -1,14 +1,16 @@
 const mongoose = require('../Backend/node_modules/mongoose');
 const TXSchema = require('./Transactions').TransactionSchema;
 const TXModel = require('./Transactions').Transactions;
-
+const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
+const { PassThrough } = require('stream');
+const Block = require('../Models/Block');
 
 const MAX_TX_PER_BLOCK = 4;
 
 const BlockSchema = new mongoose.Schema({
     /**
      *  Attributes:
-     * @param {*} timeStamp 
+     * @param {*} timestamp 
      * @param {*data of the block} transaction 
      * @param {*previous hash - default value for the first block} prevHash 
      * @var {*current hash which is calculated by the relevant values} hash
@@ -24,7 +26,7 @@ const BlockSchema = new mongoose.Schema({
     transactions:[TXSchema],
     prevHash:{
         type: String,
-        required: true
+        required: false
     },
     hash:{
         type: String,
@@ -33,41 +35,46 @@ const BlockSchema = new mongoose.Schema({
     nonce:{
         type: Number,
         required: true
-    },
+    }/*,
     merkleTree:{
 
     },
     bloomFilter:{
 
-    }
+    }*/
 });
 
 
-//Basic functions to Block Schema
-/**
- * @returns {*false in case we need to mine new block otherwise true}
- */
-/*BlockSchema.statics.addTransactionToBlock = async (fromAddress, toAddress, amount)=>{
-    //Each block contains at the most MAX_TX_PER_BLOCK Transactions
-    let indicate = false
-    if(BlockSchema.Transactions.length > MAX_TX_PER_BLOCK){
-        throw new Error(`Block error ! Block cannot contain more then ${MAX_TX_PER_BLOCK} transactions !`)
-    }
-    if(BlockSchema.Transactions.length < MAX_TX_PER_BLOCK){
-        indicate = true;
-    }
-    //else indicate stays false
-    let inserted = await new TXModel({fromAddress, toAddress, amount});
-    await BlockSchema.Transactions.push(inserted);
-    try{
-        await BlockModel.save();
-        console.log('[+] Transaction added to block successfully !');
-    }
-    catch(err){
-        console.error('[-] Couldn\'t save Transaction in block');
+
+
+BlockSchema.methods.calculateHash = async function(transaction){
+    return SHA256(this.prevHash + this.timestamp + JSON.stringify(transaction) + this.nonce).toString();
+}
+
+//Comparing the hash with a string that composed by "difficulty+1" zeros
+BlockSchema.methods.mineBlock = async function(difficulty){
+    let padding = '0'.repeat(difficulty);
+    while(this.hash.substr(0, difficulty) !== padding){
+        this.nonce ++;
+        this.hash = this.methods.calculateHash();
     }
 }
-*/
+
+/**
+ * @param {The TX to be added} transaction
+ * @returns {True in case there is no need to mine a new block} flag 
+ */
+BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
+    const total = await this.methods.amountOfTX();
+    let flag = (total != 4);
+    this.transactions.push({fromAddress, toAddress, amount});
+    return flag;
+}
+
+//Using aggregate to find the amount of TX in the block
+BlockSchema.methods.amountOfTX = function(){
+    return (BlockModel.aggregate([{$match: {hash: this.hash}}, {$project:{transactions: {$size: '$transactions'}}}]));
+}
 
 
 
@@ -75,8 +82,6 @@ const BlockSchema = new mongoose.Schema({
 
 
 const BlockModel = mongoose.model('Block', BlockSchema);
-
-
 
 
 module.exports = {BlockModel,BlockSchema};

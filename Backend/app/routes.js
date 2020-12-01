@@ -1,13 +1,19 @@
 const express = require('express');
-const Users = require('../../Schemas/Users');
-const Transactions = require('../../Schemas/Transactions');
+
 const Miners = require('../../Schemas/Miners');
+const Users = require('../../Schemas/Users');
+
+
+const {TransactionModel, TransactionSchema} = require('../../Schemas/Transactions');
 const { BlockModel, BlockSchema } = require('../../Schemas/Block');
-//TEMP!
-const Block = require('../../Schemas/Block').BlockModel;
+const {BlockchainModel,BlockchainSchema} = require('../../Schemas/Blockchain');
+
 
 function routes(app){
     const router = express.Router();
+    //const blockchain = new BlockchainModel();
+
+
     //Routes
     /**
      * <------ GET REQUESTS ------->
@@ -165,7 +171,6 @@ function routes(app){
      */
     router.post('/temp', async (req,res)=>{
         try{
-            let addedTX = await BlockModel.addTransactionToBlock(req.body.fromAddress, req.body.toAddress, req.body.amount);
             res.send({message:"Transaction added to block"})
         }
         catch(err){

@@ -32,3 +32,6 @@ BlockchainModel.methods.addTransaction = async(fromAddress, toAddress, amount)=>
 
 
 const BlockchainModel = mongoose.model('Blockchain', BlockSchema);
+
+
+module.exports = {BlockchainModel, BlockchainSchema};

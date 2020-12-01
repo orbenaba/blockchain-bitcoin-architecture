@@ -1,11 +1,11 @@
-const SHA256 = require('crypto-js/sha256');
+/*const SHA256 = require('crypto-js/sha256');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 const { PartitionedBloomFilter} = require('bloom-filters');
 
 // mine
 const {MerkleTree } = require('./MerkleTree');
-const {Transaction} = require('./Transaction');
+const {Transaction} = require('./Transaction');*/
 
 class Block{
     /**
@@ -19,7 +19,7 @@ class Block{
      * @var {*used for disqualify the fact that a transaction is not in the merkle tree
      * , might invoke false positive alerts} bloomFilter
      */
-    constructor(timeStamp, transaction,prevHash=''){
+  /*  constructor(timeStamp, transaction,prevHash=''){
         let hashedTX = null;
         if(transaction instanceof Transaction){
             hashedTX = transaction.calculateHash();
@@ -27,7 +27,6 @@ class Block{
         else{
             throw new Error("A transaction must be first passed for block ...")
         }
-
         this.timeStamp = timeStamp;
         this.prevHash = prevHash;
         this.hash = this.calculateHash(transaction);
@@ -59,13 +58,13 @@ class Block{
             }
         }
         return true;
-    }
+    }*/
     /**
      * Adding a new Transaction to the merkle tree
      * @returns { true : need to mine a new block
      *            false: no need}
      */
-    addTransaction(transaction){
+    /*addTransaction(transaction){
         //Each block hash at the most 4 transactions according to the instructions
         const amount = MerkleTree.getAmountOfTX(this.merkleTree.root);
         if(amount < 3){
@@ -81,7 +80,7 @@ class Block{
             return console.error("Cannot add more than 4 transactions per block ...");
         }
     }
-
+*/
 }
 
 
