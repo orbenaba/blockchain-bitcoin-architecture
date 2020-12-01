@@ -2,7 +2,9 @@ const express = require('express');
 const Users = require('../../Schemas/Users');
 const Transactions = require('../../Schemas/Transactions');
 const Miners = require('../../Schemas/Miners');
-
+const { BlockModel, BlockSchema } = require('../../Schemas/Block');
+//TEMP!
+const Block = require('../../Schemas/Block').BlockModel;
 
 function routes(app){
     const router = express.Router();
@@ -23,7 +25,7 @@ function routes(app){
      */
     router.get('/',(req, res)=>{
         //This is where we send the main page
-        res.send('j00k3r c0in');
+        res.send({message:'j00k3r c0in'});
     });
     /**
      * Displaying all the users in the DB
@@ -84,7 +86,6 @@ function routes(app){
             res.send({message:'TX added successfully !!!'})
         }
     })
-
 
     //Adding new user
     router.post('/users', (req,res)=>{
@@ -157,6 +158,21 @@ function routes(app){
         }
     })
 
+
+
+    /**
+     * Temp route ! 
+     */
+    router.post('/temp', async (req,res)=>{
+        try{
+            let addedTX = await BlockModel.addTransactionToBlock(req.body.fromAddress, req.body.toAddress, req.body.amount);
+            res.send({message:"Transaction added to block"})
+        }
+        catch(err){
+            console.error(err);
+            res.send({message:"Error in adding TX to block"})
+        }
+    })
 
     //Externalizing the created API to the app
     app.use('/',router);

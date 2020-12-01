@@ -16,13 +16,16 @@ const TransactionSchema = new mongoose.Schema({
     amount:{
         type: Number,
         required: true
+    },
+    timestamp:{
+        type: Date,
+        required: true
     }
-},{timestamps: true}
-)
+})
 
 //Supposing the data came here is valid
 //Adding transaction to the schema
-TransactionSchema.statics.addTransaction = async (fromAddress, toAddress, amount)=>{
+/*TransactionSchema.statics.addTransaction = async (fromAddress, toAddress, amount)=>{
     let inserted = new Transactions({fromAddress, toAddress, amount});
     await inserted.save()
                 .then(item=>{
@@ -51,10 +54,17 @@ TransactionSchema.statics.removeAll = async()=>{
         await Transactions.deleteMany({})
         console.log('[+] All Transactions removed successfully');
     }
+
     catch(err){
         console.error('[-] Error in deleting all the rows in TX schema')
     }
-}
-const Transactions = mongoose.model('Transactions', TransactionSchema);
+}*/
 
-module.exports = Transactions;
+
+
+
+
+
+const TransactionModel = mongoose.model('Transactions', TransactionSchema);
+
+module.exports = {TransactionModel, TransactionSchema};

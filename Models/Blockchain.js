@@ -36,7 +36,8 @@ class Blockchain{
     }
 
     /**
-     * @param {*The public key of the miner} minerAddress 
+     * @param {*The publi
+     c key of the miner} minerAddress 
      * Whenever money is added/removed to some user, the transaction is written in the block
      * so when the miner signed a transaction he get a reward which also written to the block
      */
