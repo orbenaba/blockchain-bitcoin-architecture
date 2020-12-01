@@ -48,7 +48,7 @@ TransactionSchema.statics.displayAll = async ()=>{
 //Removing all the schema
 TransactionSchema.statics.removeAll = async()=>{
     try{
-        Transactions.remove({})
+        await Transactions.deleteMany({})
         console.log('[+] All Transactions removed successfully');
     }
     catch(err){
