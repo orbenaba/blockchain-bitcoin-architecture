@@ -8,17 +8,6 @@ const {MerkleTree } = require('./MerkleTree');
 const {Transaction} = require('./Transaction');*/
 
 class Block{
-    /**
-     *  Attributes:
-     * @param {*} timeStamp 
-     * @param {*data of the block} transaction 
-     * @param {*previous hash - default value for the first block} prevHash 
-     * @var {*current hash which is calculated by the relevant values} hash
-     * @var {*for mining, by manipulating its value} nonce
-     * @var {*used for quick searching in the block} merkleTree
-     * @var {*used for disqualify the fact that a transaction is not in the merkle tree
-     * , might invoke false positive alerts} bloomFilter
-     */
   /*  constructor(timeStamp, transaction,prevHash=''){
         let hashedTX = null;
         if(transaction instanceof Transaction){

@@ -4,7 +4,7 @@ const ec = new EC('secp256k1');
 
 
 //Users schema
-const UsersSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     publicKey:{
         unique: true,
         type: String,
@@ -25,11 +25,11 @@ const UsersSchema = new mongoose.Schema({
 
 
 //Basic functions to use with the DB
-UsersSchema.statics.addUser = async (name)=>{
+UserSchema.statics.addUser = async (name)=>{
     const genKeys = ec.genKeyPair();
     const publicKey = genKeys.getPublic('hex');
     const privateKey = genKeys.getPrivate('hex');
-    let user = new Users({publicKey, privateKey, name});
+    let user = new UserModel({publicKey, privateKey, name});
     await user.save()
         .then(item =>{
             console.log("Data saved in DB !");
@@ -40,8 +40,8 @@ UsersSchema.statics.addUser = async (name)=>{
         })
 }
 
-UsersSchema.statics.removeUser = async (pubKey, priKey, name)=>{
-    const removed = new Users({pubKey, priKey,name});
+UserSchema.statics.removeUser = async (pubKey, priKey, name)=>{
+    const removed = new UserModel({pubKey, priKey,name});
     removed.remove((err, deleted)=>{
         if(err){
             return console.error("Error in removing the users, maybe don't exist ...");
@@ -50,10 +50,10 @@ UsersSchema.statics.removeUser = async (pubKey, priKey, name)=>{
     })
 }
 
-UsersSchema.statics.removeAllUsers = async ()=>{
+UserSchema.statics.removeAllUsers = async ()=>{
     //{} means ALL
     try{
-        await Users.deleteMany({});
+        await UserModel.deleteMany({});
     }
     catch(err){
         return console.error("[-] Error removing all the rows in the schema ...");
@@ -61,9 +61,9 @@ UsersSchema.statics.removeAllUsers = async ()=>{
 }
 
 //Retrieving all the rows from DB
-UsersSchema.statics.displayAll = async ()=>{
+UserSchema.statics.displayAll = async ()=>{
     try{
-        const data = await Users.find({});
+        const data = await UserModel.find({});
         return data;
     }
     catch(err){
@@ -71,6 +71,6 @@ UsersSchema.statics.displayAll = async ()=>{
     }
 }
 
-const Users = mongoose.model('Users', UsersSchema);
+const UserModel = mongoose.model('Users', UserSchema);
 
-module.exports = Users;
+module.exports = {UserModel, UserSchema};

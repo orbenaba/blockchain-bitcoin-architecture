@@ -1,8 +1,8 @@
 const mongoose = require('../Backend/node_modules/mongoose');
-const Blockchain = require('../Models/Blockchain');
-const Block = require('./Block');
 const {BlockModel, BlockSchema} = require('./Block');
 const {TransactionModel, TransactionSchema} = require('./Transactions');
+const {UserModel, UserSchema} = require('./Users');
+
 
 const REWARD = 100;
 
@@ -143,10 +143,23 @@ BlockchainSchema.methods.popFirstPendingTX = async function(){
 }
 
 /**
- * 
+ * Scanning all the blockchain to find the balance of a specific address
  */
 BlockchainSchema.methods.getBalanceOfAddress = async function(address){
-
+    let balance = 0;
+    for(const block of this.chain){
+        for(const tran of block.transactions){
+            //The miner spends out money
+            if(tran.fromAddress === address){
+                balance -= tran.amount;
+            }
+            //The miner profits money
+            if(tran.toAddress === address){
+                balance += tran.amount;
+            }
+        }
+    }
+    return balance;
 }
 
 
@@ -174,7 +187,7 @@ BlockchainSchema.methods.isChainValid = async function(){
 }
 
 /**
- * 
+ * Re-retrieve the data from the DB 
  */
 BlockchainSchema.methods.refresh = async function(){
      try{
