@@ -1,30 +1,30 @@
-const {Block} = require('./Block');
+/*const {Block} = require('./Block');
 const {Transaction} = require('./Transaction');
 const {MerkleTree} = require('./MerkleTree');
 const {Miner} = require('./Miner');
-
+*/
 //Might be changed with some reasons
 var REWARD = 100;
-
-class Blockchain{
+/*
+class Blockchain{*/
     /**
      * @var {*Building our chain as an array} chain
      * @var {*The length of zeros which the miner needs to get to} difficulty
      * @var {*The pending transactions which wait for someone to mine a block for them} pendingTransactions
      * @var {*The price the miner gets when succeeds} miningReward
      * @var {*The latest block in the chain which will be replaced when filled with 4 transactions at the most} currentBlock
-     */
+     *//*
     constructor(){
         this.chain = [this.createGenesisBlock()];
         this.difficulty = 1;
         this.pendingTransactions = [];
         this.miningReward = REWARD;
         this.currentBlock = null;
-    }
+    }*/
     /**
      * The first block of the blockchain
      * It has only one transaction ! ! !
-     */
+     *//*
     createGenesisBlock(){
         return new Block("01/01/2020",new Transaction("Genesis block","Genesis block",0),"o");
     }
@@ -43,41 +43,13 @@ class Blockchain{
         }
         this.pendingTransactions.push(transaction);
     }  
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-    
-
-    /**
+*/    /**
      * @param {*The publi
      c key of the miner} minerAddress 
      * Whenever money is added/removed to some user, the transaction is written in the block
      * so when the miner signed a transaction he get a reward which also written to the block
      */
-    miningPendingTransactions(minerAddress){
+  /*  miningPendingTransactions(minerAddress){
         if(minerAddress instanceof Miner){
             minerAddress = minerAddress.publicKey;
         }
@@ -87,7 +59,7 @@ class Blockchain{
         const inserted = this.pendingTransactions[0];
         //moving it from the pending 
         this.pendingTransactions = this.pendingTransactions.slice(1);
-
++/
         if(this.currentBlock === null){
             //Mining with the first Transaction
             this.currentBlock = new Block(Date.now(), inserted ,this.getLatestBlock().hash);
@@ -97,7 +69,7 @@ class Blockchain{
              * one for the miner
              * one which was the purpose of mining 
              */
-            if(this.currentBlock.addTransaction(inserted) === true){
+  /*          if(this.currentBlock.addTransaction(inserted) === true){
                 this.chain.push(...this.currentBlock);//dereferencing to the values
                 this.currentBlock = null;
                 //add now new block for the next if statement
@@ -120,13 +92,12 @@ class Blockchain{
                 this.currentBlock = null;
             }
         }    
-    }
-
+    }*/
     /**
      * In the real Bitcoin there is no "Balance" attribute for each block
      * It's calculated by scanning all the blockchain
      * @param {Queried Address} address 
-     */
+     *//*
     getBalanceOfAddress(address){
         let balance = 0;
         for(const block of this.chain){
@@ -166,4 +137,4 @@ class Blockchain{
     }
 }
 
-module.exports = Blockchain;
+module.exports = Blockchain;*/

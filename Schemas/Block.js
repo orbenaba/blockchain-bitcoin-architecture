@@ -98,7 +98,7 @@ BlockSchema.methods.mineBlock = async function(difficulty){
  */
 BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
     const total = await BlockModel.amountOfTX(this);
-    let flag = (total != 3);
+    let flag = (total != MAX_TX_PER_BLOCK-1);
     try{
         await BlockModel.findOne({_id: this._id})
                     .then(async function(record){

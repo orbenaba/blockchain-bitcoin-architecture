@@ -1,5 +1,6 @@
 const {TransactionModel, TransactionSchema} = require('./Transactions');
 const {BlockModel, BlockSchema} = require('./Block');
+const {BlockchainModel, BlockchainSchema} = require('./Blockchain');
 const mongoose = require('../Backend/node_modules/mongoose');
 
 
@@ -10,7 +11,7 @@ mongoose.connect(db, {useNewUrlParser: true})
 
 
 async function temp(){
-    let block =  new BlockModel({
+/*    let block =  new BlockModel({
         timestamp: Date.now(),
         transactions: [],
         hash: "wednsoc",
@@ -84,7 +85,10 @@ async function temp(){
 
 
     console.log("[+] Checking ...");
-    console.log("Valid? ",await block.hasValidTransactions());
+    console.log("Valid? ",await block.hasValidTransactions());*/
+    let chain = await new BlockchainModel({difficulty: 1});
+    await chain.save();
+    
 }
 
 temp();

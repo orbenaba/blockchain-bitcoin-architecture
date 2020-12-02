@@ -1,10 +1,9 @@
-
-const { errorMonitor } = require('stream');
 const mongoose = require('../Backend/node_modules/mongoose');
 const Blockchain = require('../Models/Blockchain');
 const {BlockModel, BlockSchema} = require('./Block');
 const {TransactionModel, TransactionSchema} = require('./Transactions');
 
+const REWARD = 100;
 
 const BlockchainSchema = new mongoose.Schema({
     /**
@@ -14,7 +13,7 @@ const BlockchainSchema = new mongoose.Schema({
      * @var {*The price the miner gets when succeeds} miningReward
      * @var {*The latest block in the chain which will be replaced when filled with 4 transactions at the most} currentBlock
      */
-    chain:[BlockSchema],
+    chain: [BlockSchema],
     difficulty:{
         type: Number,
         required: true,
@@ -28,23 +27,36 @@ const BlockchainSchema = new mongoose.Schema({
     },
     currentBlock: BlockSchema
 })
-
-//Methods
-BlockchainModel.methods.createGenesisBlock = async function(){
-    return new BlockModel(Date.now(), new TransactionModel("Genesis block","Genesis block",0,Date.now()),"","",0);
-}
+/**
+ * Hook function to fill the first genesis block when the blockchain is created
+ */
+BlockchainSchema.pre("save",function(next){
+    try{
+        if(this.chain.length == 0){
+            const pushed = new BlockModel({timestamp: Date.now(),
+                transactions:{fromAddress:"Genesis block",toAddress:"Genesis block",amount:0,timestamp:Date.now()}
+                 ,prevHash:"",hash:"",nonce:0});
+            console.log("2".repeat(100));
+            this.chain.push(pushed)
+            console.log("Genesis ...");
+        }
+        next();    
+    }catch(err){
+        console.error(err);
+    }
+})
 
 /**
  * 
  */
-BlockchainModel.methods.getLatestBlock = async function(){
+BlockchainSchema.methods.getLatestBlock = async function(){
     return this.currentBlock;
 }
 
 /**
  * 
  */
-BlockchainModel.methods.addTransaction = async function(fromAddress, toAddress, amount){
+BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
     /**
      * Simply push the transaction to the pendingArray
      * Note that caller must call refresh func after calling this func
@@ -67,7 +79,7 @@ BlockchainModel.methods.addTransaction = async function(fromAddress, toAddress, 
  * Boolean - True -> means 
  * }
  */
-BlockchainModel.methods.miningPendingTransactions = async function(minerAddress){
+BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress){
     //The miner collect at the most 3 transactions together and mining em
     let blocksToMine = [];
     while(true)
@@ -79,7 +91,7 @@ BlockchainModel.methods.miningPendingTransactions = async function(minerAddress)
             return;
         } 
         blocksToMine.push(pendedTX);
-        const res = await this.currentBlock.addTransaction({fromAddress: pendedTX.fromAddress,toAddress: pendedTX.toAddress,amount: pendedTX.amount}))
+        const res = await this.currentBlock.addTransaction({fromAddress: pendedTX.fromAddress,toAddress: pendedTX.toAddress,amount: pendedTX.amount});
         this.currentBlock = await this.currentBlock.refresh();
         if(res === false)//We need to mine the current block and advance
         {
@@ -93,6 +105,7 @@ BlockchainModel.methods.miningPendingTransactions = async function(minerAddress)
 
         }
     }
+}
 /**
  * Helper method:
  * @param {The array to be hashed}
@@ -106,7 +119,7 @@ BlockchainModel.methods.miningPendingTransactions = async function(minerAddress)
  * 
  * @returns {The first pending TX and remove it, if there are no pending TXs, then returns false} 
  */
-BlockchainModel.methods.popFirstPendingTX = async function(){
+BlockchainSchema.methods.popFirstPendingTX = async function(){
     try{
         //Referring the array like a queue
         const returned = await this.pendingTransactions.shift();
@@ -120,7 +133,7 @@ BlockchainModel.methods.popFirstPendingTX = async function(){
 /**
  * 
  */
-BlockchainModel.methods.getBalanceOfAddress = async function(address){
+BlockchainSchema.methods.getBalanceOfAddress = async function(address){
 
 }
 
@@ -129,14 +142,14 @@ BlockchainModel.methods.getBalanceOfAddress = async function(address){
  * 
  */
 
- BlockchainModel.methods.isChainValid = async function(){
+BlockchainSchema.methods.isChainValid = async function(){
      
  }
 
 /**
  * 
  */
- BlockchainModel.methods.refresh = async function(){
+BlockchainSchema.methods.refresh = async function(){
      try{
         const returned = await BlockchainModel.findById(this._id);
         return returned;
@@ -147,7 +160,7 @@ BlockchainModel.methods.getBalanceOfAddress = async function(address){
  }
 
 
-const BlockchainModel = mongoose.model('Blockchain', BlockSchema);
+const BlockchainModel = mongoose.model('Blockchain', BlockchainSchema);
 
 
-module.exports = {BlockchainModel, BlockchainSchema};
+module.exports = {BlockchainModel,BlockchainSchema}

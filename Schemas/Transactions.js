@@ -27,7 +27,7 @@ const TransactionSchema = new mongoose.Schema({
         type: Date,
         required: true,
         default: Date.now()
-    },
+    }
     /*signature:{
         type: String,
         required: true
