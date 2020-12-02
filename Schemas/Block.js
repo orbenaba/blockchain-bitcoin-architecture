@@ -27,7 +27,8 @@ const BlockSchema = new mongoose.Schema({
      */
     timestamp:{
         type: Date,
-        required: true
+        required: true,
+        default:Date.now()
     },
     transactions:[TXSchema],
     prevHash:{
@@ -36,11 +37,13 @@ const BlockSchema = new mongoose.Schema({
     },
     hash:{
         type: String,
-        required: true
+        required: true,
+        default:"No hash yet"
     },
     nonce:{
         type: Number,
-        required: true
+        required: true,
+        default:0
     }/*,
     merkleTree:{
 
@@ -56,7 +59,7 @@ const BlockSchema = new mongoose.Schema({
  * 
  * @param {The offset to be added to the nonce rather then updating each time the DB} index 
  */
-BlockSchema.methods.calculateHash = async function(index){
+BlockSchema.methods.calculateHash = async function(index = 0){
     return SHA256(this.prevHash + this.timestamp + JSON.stringify(this.transactions) + (this.nonce + index)).toString();
 }
 
@@ -68,12 +71,11 @@ BlockSchema.methods.mineBlock = async function(difficulty){
     let tempHash = null;
     do{
         tempHash = await this.calculateHash(index++);
-        console.log("parma1 = ",tempHash.toString().substr(0, difficulty));
-        console.log("param2 = ",padding);
     }while(tempHash.toString().substr(0, difficulty) !== padding)
 
     this.nonce += index - 1;
     this.hash = tempHash;
+    console.log("Mined block = ", this);
     console.log('[+] Block mined successfully !');
     await this.save();
 }
@@ -97,14 +99,15 @@ BlockSchema.methods.mineBlock = async function(difficulty){
  * @returns {True in case there is no need to mine a new block} flag 
  */
 BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
-    const total = await BlockModel.amountOfTX(this);
-    let flag = (total != MAX_TX_PER_BLOCK-1);
+    const total = await this.transactions.length;
+    let flag = (total != MAX_TX_PER_BLOCK - 2);
     try{
-        await BlockModel.findOne({_id: this._id})
-                    .then(async function(record){
-                        await record.transactions.push({fromAddress,toAddress,amount,timestamp: Date.now()})
-                        await record.save()
-                    })
+        if(this.transactions === null){
+            this.transactions = await [{fromAddress,toAddress,amount,timestamp: Date.now()}];
+        }
+        else{
+            await this.transactions.push({fromAddress,toAddress,amount,timestamp: Date.now()});
+        }
     }catch(err){
         console.error(err);
     }
@@ -123,19 +126,15 @@ BlockSchema.methods.refresh = async function(){
 }
 
 
-
-
 //Using aggregate to find the amount of TX in the block
 BlockSchema.statics.amountOfTX = async function(blk){
     try{
-        const temp = await BlockModel.findOne(blk);
+        const temp = await BlockModel.findById(blk._id);
         return (temp.transactions === null? 0 : temp.transactions.length);
     }
     catch(err){
         console.error(err);
     }
-    //More complicated solution:
-    //return (BlockModel.aggregate([{$match: {hash: this.hash}}, {$project:{transactions: {$size: '$transactions'}}}]));
 }
 
 
