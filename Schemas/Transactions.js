@@ -27,7 +27,7 @@ const TransactionSchema = new mongoose.Schema({
         type: Date,
         required: true
     }
-})
+},console.log("IN SCHEMA"))
 
 
 TransactionSchema.methods.calculateHash = async function(){

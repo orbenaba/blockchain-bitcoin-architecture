@@ -12,7 +12,7 @@ mongoose.connect(db, {useNewUrlParser: true})
 async function temp(){
     let block =  new BlockModel({
         timestamp: Date.now(),
-        transactions: null,
+        transactions: [],
         hash: "wednsoc",
         nonce: 0
     });
@@ -20,24 +20,67 @@ async function temp(){
         await block.save();
         console.log('[+] Block saved !');
     }catch(err){
-        throw new Error('[+] Failure');
+        return console.error('[+] Failure');
     }
+    let te = await BlockModel.amountOfTX(block);
+    console.log("Amount of TX: ", te);
 
-    console.log("Amount of TX: ", block.amountOfTX());
-    
-    /*
-    block.addTransaction('1.1.1.1', '2.2.2.2',100);
-    console.log("Amount of TX: ", block.amountOfTX());
-    
-     block.addTransaction('1.1.1.1', '2.2.2.2',100);
-    console.log("Amount of TX: ", block.amountOfTX());
-    
-     block.addTransaction('1.1.1.1', '2.2.2.2',100);
-    console.log("Amount of TX: ", block.amountOfTX());
-    
-     block.addTransaction('1.1.1.1', '2.2.2.2',100);
-    console.log("Amount of TX: ", block.amountOfTX());
-*/
+
+    await block.addTransaction('1.1.ew1.1', '2.w2.2.2',10220);
+    block = await block.refresh()
+    console.log('[+] Block added');
+    try{
+        await block.save();
+        console.log('[+] Block saved !');
+    }catch(err){
+        return new Error('[+] Failure');
+    }
+    console.log(block);
+    te = await BlockModel.amountOfTX(block);
+    console.log("Amount of TX: ", te,"\n");
+
+
+    await block.addTransaction('1.1.aew1.1', '2.w2.2.2',102120);
+    block = await block.refresh()
+    console.log('[+] Block added');
+    try{
+        await block.save();
+        console.log('[+] Block saved !');
+    }catch(err){
+        return new Error('[+] Failure');
+    }
+    console.log(block);
+    te = await BlockModel.amountOfTX(block);
+    console.log("Amount of TX: ", te,"\n");
+
+
+    await block.addTransaction('1.1.daew1.1', '2.w2sa2.2',101220);
+    block = await block.refresh()
+    console.log('[+] Block added');
+    try{
+        await block.save();
+        console.log('[+] Block saved !');
+    }catch(err){
+        return new Error('[+] Failure');
+    }
+    console.log(block);
+    te = await BlockModel.amountOfTX(block);
+    console.log("Amount of TX: ", te,"\n");
+
+
+
+    await block.addTransaction('1.1.edadxsaw1.1', '2.wcds2.2.2',102210);
+    block = await block.refresh()
+    console.log('[+] Block added');
+    try{
+        await block.save();
+        console.log('[+] Block saved !');
+    }catch(err){
+        return new Error('[+] Failure');
+    }
+    console.log(block);
+    te = await BlockModel.amountOfTX(block);
+    console.log("Amount of TX: ", te,"\n");
 }
 
 temp();
