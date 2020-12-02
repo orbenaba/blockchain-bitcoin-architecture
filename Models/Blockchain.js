@@ -21,7 +21,6 @@ class Blockchain{
         this.miningReward = REWARD;
         this.currentBlock = null;
     }
-
     /**
      * The first block of the blockchain
      * It has only one transaction ! ! !
@@ -34,6 +33,43 @@ class Blockchain{
     getLatestBlock(){
         return this.chain[this.chain.length-1];
     }
+    addTransaction(transaction){
+        //first Verify
+        if(!transaction.fromAddress || !transaction.toAddress){
+            throw new Error("[-] Transaction must include fromAddress and toAddress fields!");
+        }
+        if(!transaction.isValid()){
+            throw new Error("[-] Can't add invalid transaction to the chain");
+        }
+        this.pendingTransactions.push(transaction);
+    }  
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    
 
     /**
      * @param {*The publi
@@ -84,17 +120,6 @@ class Blockchain{
                 this.currentBlock = null;
             }
         }    
-    }
-
-    addTransaction(transaction){
-        //first Verify
-        if(!transaction.fromAddress || !transaction.toAddress){
-            throw new Error("[-] Transaction must include fromAddress and toAddress fields!");
-        }
-        if(!transaction.isValid()){
-            throw new Error("[-] Can't add invalid transaction to the chain");
-        }
-        this.pendingTransactions.push(transaction);
     }
 
     /**

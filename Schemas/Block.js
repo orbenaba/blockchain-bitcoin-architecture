@@ -52,19 +52,45 @@ const BlockSchema = new mongoose.Schema({
 
 
 
-
-BlockSchema.methods.calculateHash = async function(transaction){
-    return SHA256(this.prevHash + this.timestamp + JSON.stringify(transaction) + this.nonce).toString();
+/**
+ * 
+ * @param {The offset to be added to the nonce rather then updating each time the DB} index 
+ */
+BlockSchema.methods.calculateHash = async function(index){
+    return SHA256(this.prevHash + this.timestamp + JSON.stringify(this.transactions) + (this.nonce + index)).toString();
 }
 
 //Comparing the hash with a string that composed by "difficulty+1" zeros
 BlockSchema.methods.mineBlock = async function(difficulty){
     let padding = '0'.repeat(difficulty);
-    while(this.hash.substr(0, difficulty) !== padding){
-        this.nonce ++;
-        this.hash = this.methods.calculateHash();
-    }
+    let index = 0;
+    console.log('[+] Start mining ...');
+    let tempHash = null;
+    do{
+        tempHash = await this.calculateHash(index++);
+        console.log("parma1 = ",tempHash.toString().substr(0, difficulty));
+        console.log("param2 = ",padding);
+    }while(tempHash.toString().substr(0, difficulty) !== padding)
+
+    this.nonce += index - 1;
+    this.hash = tempHash;
+    console.log('[+] Block mined successfully !');
+    await this.save();
 }
+
+/**
+ * 
+ */
+
+ BlockSchema.methods.hasValidTransactions = async function(){
+     for(const tx of this.transactions){
+         if(!tx.isValid()){
+             return false;
+         }
+     }
+     return true;
+ }
+
 
 /**
  * @param {The TX to be added} transaction
@@ -72,19 +98,13 @@ BlockSchema.methods.mineBlock = async function(difficulty){
  */
 BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
     const total = await BlockModel.amountOfTX(this);
-    let flag = (total != 4);
+    let flag = (total != 3);
     try{
-        //await BlockSchema.findOneAndUpdate({_id:ObjectID(this._id)}, {$push: {transactions : {fromAddress,toAddress,amount,timestamp: Date.now()}}})
         await BlockModel.findOne({_id: this._id})
                     .then(async function(record){
                         await record.transactions.push({fromAddress,toAddress,amount,timestamp: Date.now()})
                         await record.save()
                     })
-        //await BlockModel.updateOne({_id:ObjectID(this._id)}, {$addToSet: {transactions : [{fromAddress,toAddress,amount,timestamp: Date.now()}]}})
-        /*console.log("2)this._id = ", this._id);
-        let inserted = {fromAddress, toAddress, amount};
-        BlockModel.findByIdAndUpdate(this._id,
-                    {$push: {transactions: inserted}})*/
     }catch(err){
         console.error(err);
     }

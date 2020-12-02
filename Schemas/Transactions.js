@@ -25,9 +25,14 @@ const TransactionSchema = new mongoose.Schema({
     },
     timestamp:{
         type: Date,
+        required: true,
+        default: Date.now()
+    },
+    /*signature:{
+        type: String,
         required: true
-    }
-},console.log("IN SCHEMA"))
+    }*/
+});
 
 
 TransactionSchema.methods.calculateHash = async function(){
@@ -61,12 +66,12 @@ TransactionSchema.methods.isValid = async function(){
     if(this.fromAddress === null){
         return true;
     }
-    if(!this.signature || this.signature === 0){
+    /*if(!this.signature || this.signature === 0){
         throw new Error("[-] There is no signature for this transaction");
-    }
-    const publicKey = ec.keyFromPublic(this.fromAddress,'hex');
+    }*/
+    const publicKey = await ec.keyFromPublic(this.fromAddress,'hex');
     //We decrypt the signature with the publicKey and then compare it to the this.calculateHash()
-    return publicKey.verify(this.calculateHash(), this.signature);
+    return await publicKey.verify(this.calculateHash(), this.signature);
 }
 
 const TransactionModel = mongoose.model('Transactions', TransactionSchema);

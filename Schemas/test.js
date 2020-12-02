@@ -81,6 +81,10 @@ async function temp(){
     console.log(block);
     te = await BlockModel.amountOfTX(block);
     console.log("Amount of TX: ", te,"\n");
+
+
+    console.log("[+] Checking ...");
+    console.log("Valid? ",await block.hasValidTransactions());
 }
 
 temp();

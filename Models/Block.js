@@ -37,49 +37,6 @@ class Block{
         this.bloomFilter = new PartitionedBloomFilter(2048, 1024);
         this.bloomFilter.add(hashedTX);
     }
-
-    calculateHash(transaction){
-        return SHA256(this.prevHash+this.timeStamp+JSON.stringify(transaction)+this.nonce).toString();
-    }
-    //In real life, the difficulty is changed every two weeks
-    mineBlock(difficulty){
-        //Comparing the hash with a string that composed by "difficulty+1" zeros
-        let padding = '0'.repeat(difficulty);
-        while(this.hash.substr(0,difficulty)!==padding){
-            this.nonce ++;
-            this.hash = this.calculateHash();
-        }
-    }
-    //Each block contains some transactions and we want to validate each of them seperately
-    hasValidTransactions(){
-        for(const tx of this.transaction){
-            if(!tx.isValid()){
-                return false;
-            }
-        }
-        return true;
-    }*/
-    /**
-     * Adding a new Transaction to the merkle tree
-     * @returns { true : need to mine a new block
-     *            false: no need}
-     */
-    /*addTransaction(transaction){
-        //Each block hash at the most 4 transactions according to the instructions
-        const amount = MerkleTree.getAmountOfTX(this.merkleTree.root);
-        if(amount < 3){
-            this.merkleTree.addTransaction(transaction);
-            return false;
-        }
-        else if(amount ==3){
-            //Signing the block and need to create a new one
-            this.merkleTree.addTransaction(transaction);
-            return true;
-        }
-        else{
-            return console.error("Cannot add more than 4 transactions per block ...");
-        }
-    }
 */
 }
 
