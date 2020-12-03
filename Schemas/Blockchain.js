@@ -67,7 +67,7 @@ BlockchainSchema.methods.getLatestBlock = async function(){
  * @param {fromAddress user type - (U = Users or M = Miners)} op1
  * @param {toAddress user type - (U = Users or M = Miners)} op2
  */
-BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress, amount, op1, op2){
+BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress, amount, op1='U', op2='U'){
     try{
         await this.pendingTransactions.push({fromAddress, toAddress, amount,externalModelType1: (op1 === 'U'?'Users':'Miners'),
                                             externalModelType2:(op2 === 'U'?'Users':'Miners')});

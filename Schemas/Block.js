@@ -3,6 +3,7 @@ const TXSchema = require('./Transactions').TransactionSchema;
 const TXModel = require('./Transactions').Transactions;
 const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
 const { TransactionModel } = require('./Transactions');
+const {MerkleTreeModel,MerkleTreeSchema} = require('./MerkleTree');
 
 
 
@@ -39,10 +40,10 @@ const BlockSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default:0
-    }/*,
-    merkleTree:{
-
     },
+    merkleTree:{
+        type: MerkleTreeSchema
+    }/*,
     bloomFilter:{
 
     }*/
@@ -72,7 +73,6 @@ BlockSchema.methods.mineBlock = async function(difficulty){
 
     this.nonce += index - 1;
     this.hash = tempHash;
-    console.log("Mined block = ", this);
     console.log('[+] Block mined successfully !');
     await this.save();
 }
@@ -98,11 +98,17 @@ BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amou
     const total = await this.transactions.length;
     let flag = (total != MAX_TX_PER_BLOCK - 2);
     try{
-        if(this.transactions === null){
-            this.transactions = await [{fromAddress,toAddress,amount,timestamp: Date.now()}];
+        const inserted = {fromAddress,toAddress,amount,timestamp: Date.now()};
+        console.log("this.transactions = ",this.transactions);
+        if(this.transactions.length === 0){
+            this.transactions = await [inserted];
+            this.merkleTree = await new MerkleTreeModel(inserted);
+            await this.save();
+            console.log("this.merkleTree = ",this.merkleTree);
         }
         else{
-            await this.transactions.push({fromAddress,toAddress,amount,timestamp: Date.now()});
+            await this.merkleTree.addTransaction(inserted);
+            await this.transactions.push(inserted);
         }
     }catch(err){
         console.error(err);
