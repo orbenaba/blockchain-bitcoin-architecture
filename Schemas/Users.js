@@ -23,8 +23,10 @@ const UserSchema = new mongoose.Schema({
 })
 
 
-
-//Basic functions to use with the DB
+/**
+ * @param {The name which chose to be} name
+ * @returns {The new public key of the user} 
+ */
 UserSchema.statics.addUser = async (name)=>{
     const genKeys = ec.genKeyPair();
     const publicKey = genKeys.getPublic('hex');
@@ -33,23 +35,34 @@ UserSchema.statics.addUser = async (name)=>{
     await user.save()
         .then(item =>{
             console.log("Data saved in DB !");
-            return user;
         })
         .catch(err =>{
             console.error("Error in saving the Data ...");
         })
+    return user.publicKey;
 }
 
+/**
+ * @param {*} pubKey 
+ * @param {*} priKey 
+ * @param {*} name
+ * Deleting a specific user 
+ */
 UserSchema.statics.removeUser = async (pubKey, priKey, name)=>{
     const removed = new UserModel({pubKey, priKey,name});
     removed.remove((err, deleted)=>{
         if(err){
-            return console.error("Error in removing the users, maybe don't exist ...");
+            console.error("Error in removing the users, maybe don't exist ...");
         }
-        return deleted;
+        else{
+            return deleted;
+        }
     })
 }
 
+/**
+ * Removing all the users from the schema
+ */
 UserSchema.statics.removeAllUsers = async ()=>{
     //{} means ALL
     try{
@@ -59,8 +72,9 @@ UserSchema.statics.removeAllUsers = async ()=>{
         return console.error("[-] Error removing all the rows in the schema ...");
     }
 }
-
-//Retrieving all the rows from DB
+/**
+ * Retrieving all the rows from the schema
+ */
 UserSchema.statics.displayAll = async ()=>{
     try{
         const data = await UserModel.find({});

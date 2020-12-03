@@ -13,10 +13,12 @@ const ec = new EC('secp256k1');
 const TransactionSchema = new mongoose.Schema({
     fromAddress:{
         type: String,
+        ref:'Users',
         required: true
     },
     toAddress:{
         type: String,
+        ref:'Users',
         required: true
     },
     amount:{

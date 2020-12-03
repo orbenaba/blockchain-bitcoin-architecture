@@ -1,12 +1,7 @@
-const ObjectID  = require('../Backend/node_modules/mongodb').ObjectID;
-
-
 const mongoose = require('../Backend/node_modules/mongoose');
 const TXSchema = require('./Transactions').TransactionSchema;
 const TXModel = require('./Transactions').Transactions;
 const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
-const Block = require('../Models/Block');
-const { timeStamp } = require('console');
 const { TransactionModel } = require('./Transactions');
 
 
@@ -56,14 +51,16 @@ const BlockSchema = new mongoose.Schema({
 
 
 /**
- * 
  * @param {The offset to be added to the nonce rather then updating each time the DB} index 
+ * @returns {The hash of the whole block}
  */
 BlockSchema.methods.calculateHash = async function(index = 0){
     return SHA256(this.prevHash + this.timestamp + JSON.stringify(this.transactions) + (this.nonce + index)).toString();
 }
 
-//Comparing the hash with a string that composed by "difficulty+1" zeros
+/**
+ * @param {The amount of zeros to be achieved by the miner} difficulty 
+ */
 BlockSchema.methods.mineBlock = async function(difficulty){
     let padding = '0'.repeat(difficulty);
     let index = 0;
@@ -81,9 +78,8 @@ BlockSchema.methods.mineBlock = async function(difficulty){
 }
 
 /**
- * 
+ * Checking whether the transactions has changed by someone
  */
-
  BlockSchema.methods.hasValidTransactions = async function(){
      for(const tx of this.transactions){
          if(!tx.isValid()){
@@ -125,8 +121,9 @@ BlockSchema.methods.refresh = async function(){
     }
 }
 
-
-//Using aggregate to find the amount of TX in the block
+/**
+ * @param {Specific block to be let its length calculated} blk 
+ */
 BlockSchema.statics.amountOfTX = async function(blk){
     try{
         const temp = await BlockModel.findById(blk._id);
@@ -136,7 +133,6 @@ BlockSchema.statics.amountOfTX = async function(blk){
         console.error(err);
     }
 }
-
 
 
 const BlockModel = mongoose.model('Block', BlockSchema);
