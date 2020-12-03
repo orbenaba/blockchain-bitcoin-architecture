@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
     name:{
         type: String,
         required: false
+    },
+    money:{
+        type:Number,
+        required:true
     }
 })
 
@@ -27,11 +31,11 @@ const UserSchema = new mongoose.Schema({
  * @param {The name which chose to be} name
  * @returns {The new public key of the user} 
  */
-UserSchema.statics.addUser = async (name)=>{
+UserSchema.statics.addUser = async (name,money)=>{
     const genKeys = ec.genKeyPair();
     const publicKey = genKeys.getPublic('hex');
     const privateKey = genKeys.getPrivate('hex');
-    let user = new UserModel({publicKey, privateKey, name});
+    let user = new UserModel({publicKey, privateKey, name,money});
     await user.save()
         .then(item =>{
             console.log("Data saved in DB !");
@@ -82,6 +86,19 @@ UserSchema.statics.displayAll = async ()=>{
     }
     catch(err){
         console.log('[-] Error displaying all the schema');
+    }
+}
+
+UserSchema.statics.getMoneyByPublic = async(publicKey)=>{
+    try{
+        const user = await UserModel.findOne({publicKey});
+        if(user === null){
+            console.log("[-] User not found");
+            return null;
+        }
+        return user;
+    }catch(err){
+        console.error(err);
     }
 }
 

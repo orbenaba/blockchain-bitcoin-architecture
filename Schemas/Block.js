@@ -4,6 +4,9 @@ const TXModel = require('./Transactions').Transactions;
 const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
 const { TransactionModel } = require('./Transactions');
 const {MerkleTreeModel,MerkleTreeSchema} = require('./MerkleTree');
+const { UserModel } = require('./Users');
+const {MinerModel, MinerSchema} = require('./Miners');
+
 
 const MAX_TX_PER_BLOCK = 4;
 
@@ -93,17 +96,44 @@ BlockSchema.methods.mineBlock = async function(difficulty){
  * @param {The TX to be added} transaction
  * @returns {True in case there is no need to mine a new block} flag 
  */
-BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
+BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amount,op1 = 'U',op2 = 'U'){
+    //Validating the TX, is the fromAddress has enough money?
+    let u1 = null;
+    let u2 = null
+    if(op1 === 'M'){
+        u1 = await MinerModel.getMoneyByPublic(fromAddress);
+    }else{
+        u1 = await UserModel.getMoneyByPublic(fromAddress);
+    }
+    if(op2 === 'M'){
+        u2 = await MinerModel.getMoneyByPublic(toAddress);
+    }else{
+        u2 = await UserModel.getMoneyByPublic(toAddress);
+    }
+    if(u1 === null || u2 === null){
+        console.log("[-] Transaction not valid, users are not exist !");
+        return;
+    }
+    if(u1.money < amount){
+        console.log(`[-] From Address has no enough money, he has: ${u1.money} and tried to transfer: ${amount}`);
+        return;
+    }
+    if(u1 === 'U' ^ u2 === 'U'){
+        u1.money -= amount;
+        u2.money +=amount;
+        await u1.save();
+        await u2.save();
+    }
+
+
     const total = await this.transactions.length;
     let flag = (total != MAX_TX_PER_BLOCK - 2);
     try{
         const inserted = {fromAddress,toAddress,amount,timestamp: Date.now()};
-        console.log("this.transactions = ",this.transactions);
         if(this.transactions.length === 0){
             this.transactions = await [inserted];
             this.merkleTree = await new MerkleTreeModel(inserted);
             await this.save();
-            console.log("this.merkleTree = ",this.merkleTree);
         }
         else{
             await this.merkleTree.addTransaction(inserted);

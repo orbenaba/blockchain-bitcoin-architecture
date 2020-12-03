@@ -17,6 +17,10 @@ const MinerSchema = new mongoose.Schema({
     name:{
         type: String,
         required: false
+    },
+    money:{
+        type:Number,
+        required:true
     }
 });
 
@@ -25,31 +29,26 @@ const MinerSchema = new mongoose.Schema({
  * We need to assure that there are no more miners in the DB
  * We supply singleton design pattern !
  */
-MinerSchema.statics.addMiner = async (name)=>{
+MinerSchema.statics.addMiner = async (name, money)=>{
     try{
-        let flag = false;
-        MinerModel.findOne({},async (err, items)=>{
-            if(items !== null){
-                //In case there has already a user, we just return him
-                console.log('[+] There is already a miner in the DB !');
-                flag = true;
-                return items;
-            }
-        });
-        if(flag === false){
-            const genKeys = ec.genKeyPair();
-            const publicKey = genKeys.getPublic('hex');
-            const privateKey = genKeys.getPrivate('hex');
-            let miner = new MinerModel({publicKey, privateKey, name});
-            await miner.save()
-                .then(item =>{
-                    console.log("Miner created !");
-                })
-                .catch(err =>{
-                    console.error("Error in saving miner credentials ...");
-                })
-            return miner.publicKey;
+        const items = await MinerModel.findOne({});
+        if(items !== null){
+            //In case there has already a user, we just return him
+            console.log('[+] There is already a miner in the DB !');
+            return items.publicKey;
         }
+        const genKeys = ec.genKeyPair();
+        const publicKey = genKeys.getPublic('hex');
+        const privateKey = genKeys.getPrivate('hex');
+        let miner = await new MinerModel({publicKey, privateKey, name, money});
+        await miner.save()
+            .then(item =>{
+                console.log("Miner created !");
+            })
+            .catch(err =>{
+                console.error("Error in saving miner credentials ...");
+            })
+        return miner.publicKey;
     }
     catch(err){
         console.error('[-] Error in retrieving data from the DB');
@@ -77,6 +76,21 @@ MinerSchema.statics.removeAll = async ()=>{
         return console.error("[-] Error removing all the rows in the schema ...");
     }
 }
+
+
+MinerSchema.statics.getMoneyByPublic = async(publicKey)=>{
+    try{
+        const miner = await MinerModel.findOne({publicKey});
+        if(miner === null){
+            console.log("[-] Miner not found");
+            return null;
+        }
+        return miner;
+    }catch(err){
+        console.error(err);
+    }
+}
+
 
 
 const MinerModel = mongoose.model('Miners', MinerSchema);

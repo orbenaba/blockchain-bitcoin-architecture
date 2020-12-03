@@ -3,7 +3,7 @@ const Block = require('./Block');
 const {BlockModel, BlockSchema} = require('./Block');
 const {TransactionModel, TransactionSchema} = require('./Transactions');
 const {UserModel, UserSchema} = require('./Users');
-
+const {MinerModel, MinerSchema} = require('./Miners');
 
 const REWARD = 100;
 
@@ -104,7 +104,15 @@ BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress
         if(res === false)//We need to mine the current block and progress
         {
             //The TX which rewards the miner
-            await this.currentBlock.addTransaction(minerAddress, minerAddress,0,'M','M');
+            await this.currentBlock.addTransaction(minerAddress, minerAddress,REWARD,'M','M');
+            //Updating the DB appropriately
+            let miner = await MinerModel.getMoneyByPublic(minerAddress);
+            if(miner === null){
+                console.error("[-] Invalid miner address");
+                return;
+            }
+            miner.money += REWARD;
+            await miner.save();
             //We got 4 transactions !
             await this.currentBlock.mineBlock(this.difficulty);
             await this.chain.push(this.currentBlock);
