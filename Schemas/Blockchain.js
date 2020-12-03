@@ -1,4 +1,5 @@
 const mongoose = require('../Backend/node_modules/mongoose');
+const Block = require('./Block');
 const {BlockModel, BlockSchema} = require('./Block');
 const {TransactionModel, TransactionSchema} = require('./Transactions');
 const {UserModel, UserSchema} = require('./Users');
@@ -190,6 +191,19 @@ BlockchainSchema.methods.refresh = async function(){
     }
  }
 
+
+/**
+ * Returns all the rows in the DB
+ */
+ BlockchainSchema.statics.displayAll = async ()=>{
+     try{
+         const data = await BlockchainModel.find({});
+         return data;
+     }
+     catch(err){
+         console.error("Can't retrieve the blockchain ...");
+     }
+ }
 
 const BlockchainModel = mongoose.model('Blockchain', BlockchainSchema);
 

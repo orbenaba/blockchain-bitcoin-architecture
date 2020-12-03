@@ -1,7 +1,7 @@
 const express = require('express');
 
-const Miners = require('../../Schemas/Miners');
-const Users = require('../../Schemas/Users');
+const {MinerModel, MinerSchema} = require('../../Schemas/Miners');
+const {UserModel, UserSchema} = require('../../Schemas/Users');
 
 
 const {TransactionModel, TransactionSchema} = require('../../Schemas/Transactions');
@@ -11,8 +11,6 @@ const {BlockchainModel,BlockchainSchema} = require('../../Schemas/Blockchain');
 
 function routes(app){
     const router = express.Router();
-    //const blockchain = new BlockchainModel();
-
 
     //Routes
     /**
@@ -38,7 +36,7 @@ function routes(app){
      */
     router.get('/users',async (req,res)=>{
         //Loading everything from the users Schema and send it as a response
-        const data = await Users.displayAll();
+        const data = await UserModel.displayAll();
         if(data === null){
             res.send({message:'No users'})
         }
@@ -52,9 +50,8 @@ function routes(app){
      */
     router.get('/transactions',async (req,res)=>{
         //Loading everything from the transactions Schema and send it as a response
-        const data = await Transactions.displayAll();
-        console.log(data);
-        if(data === null || data === '{}'){
+        const data = await TransactionModel.displayAll();
+        if(data === null){
             res.send({message:'No transactions'})
         }
         else{
@@ -68,15 +65,27 @@ function routes(app){
      */
     router.get('/miner',async (req,res)=>{
         //Loading everything from the transactions Schema and send it as a response
-        const data = await Miners.displayAll();
+        const data = await MinerModel.displayAll();
         if(data == null){
             res.send({message:'No Miners'})
         }
         else{
-            console.log('All transactions sent back ...');
+            console.log('Miner sent back ...');
             res.send(data);
         }
     });
+    /**
+     * Displaying all the blockchain structure
+     */
+    router.get('/blockchain', async(req,res)=>{
+        const data  = await BlockchainModel.displayAll();
+        if(data === null){
+            res.send({message:'No blockchain created yet !'})
+        }
+        else{
+            res.send(data);
+        }
+    })
     /**
      * <----------- POST REQUESTS ----------->
      */
@@ -88,7 +97,7 @@ function routes(app){
         }
         else{
             //Saving the TX
-            Transactions.addTransaction(req.body.fromAddress,req.body.toAddress,req.body.amount)
+            TransactionModel.addTransaction(req.body.fromAddress,req.body.toAddress,req.body.amount)
             res.send({message:'TX added successfully !!!'})
         }
     })
@@ -105,7 +114,7 @@ function routes(app){
              * Saving a TX
              * Note that [publicKey, privateKey] is generated and saved automatically
              */
-            Users.addUser(req.body.name)
+            UserModel.addUser(req.body.name)
             res.send({message:'User added successfully !!!'})
         }
     })
@@ -121,7 +130,7 @@ function routes(app){
              * Saving a TX
              * Note that [publicKey, privateKey] is generated and saved automatically
              */
-            Miners.addMiner(req.body.name)
+            MinerModel.addMiner(req.body.name)
             res.send({message:'Miner added successfully !!!'})
         }
     })
@@ -133,7 +142,7 @@ function routes(app){
     //Deleting all the info in the schema
     router.delete('/transactions',(req,res)=>{
         try{
-            Transactions.removeAll();
+            TransactionModel.removeAll();
             console.log('[+] All data removed from Transactions schema !');
             res.send({message: 'Transactions\' rows deleted' })
         }
@@ -144,7 +153,7 @@ function routes(app){
 
     router.delete('/users',(req,res)=>{
         try{
-            Users.removeAllUsers();
+            UserModel.removeAllUsers();
             console.log('[+] All data removed from Users schema !');
             res.send({message: 'Users\' rows deleted' })
         }
@@ -155,7 +164,7 @@ function routes(app){
 
     router.delete('/miner',(req,res)=>{
         try{
-            Miners.removeAll();
+            MinerModel.removeAll();
             console.log('[+] All data removed from Miners schema !');
             res.send({message: 'Miners\' rows deleted' })
         }
@@ -165,18 +174,22 @@ function routes(app){
     })
 
 
-
     /**
-     * Temp route ! 
+     * 
+     * 
+     * 
+     * 
+     * 
      */
-    router.post('/temp', async (req,res)=>{
-        try{
-            res.send({message:"Transaction added to block"})
-        }
-        catch(err){
-            console.error(err);
-            res.send({message:"Error in adding TX to block"})
-        }
+
+
+
+
+
+
+
+    app.get('*', (req, res)=>{
+        res.status(404).send({message:'Page 404 not found'})
     })
 
     //Externalizing the created API to the app

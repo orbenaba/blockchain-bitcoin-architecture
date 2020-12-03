@@ -5,8 +5,6 @@ const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
 const { TransactionModel } = require('./Transactions');
 const {MerkleTreeModel,MerkleTreeSchema} = require('./MerkleTree');
 
-
-
 const MAX_TX_PER_BLOCK = 4;
 
 const BlockSchema = new mongoose.Schema({
@@ -45,7 +43,8 @@ const BlockSchema = new mongoose.Schema({
         type: MerkleTreeSchema
     }/*,
     bloomFilter:{
-
+        type:PartitionedBloomFilter,
+        default: new PartitionedBloomFilter(2048, 1024)
     }*/
 });
 
