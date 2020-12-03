@@ -134,7 +134,41 @@ function routes(app){
             res.send({message:'Miner added successfully !!!'})
         }
     })
+    /**
+     * In the request we are getting a transaction
+     * And then adding it to the DB\ creating a new blockchain
+     * The difficulty is 5 leading zeros 
+     */
+    router.post('/blockchain',async(req,res)=>{
+        const fromAddress = req.body.fromAddress;
+        const toAddress = req.body.toAddress;
+        const amount = req.body.amount;
+        if(fromAddress === null || toAddress === null || amount === null){
+            res.status(400).send({message:"All fields are required - toAddress, fromAddress, amount !"})
+            return;
+        }
+        if(fromAddress === toAddress){
+            res.status(400).send({message:"You can't transfer money to yourself"});
+            return;
+        }
+        if(amount < 0){
+            res.status(400).send({message: "HA".repeat(10)+ " Try harder !"});
+            return;
+        }
+        //Adding here validation
 
+        //Checking if the blockchain has already been created
+        let chain = await BlockchainModel.displayAll();
+        if(chain === null){
+            chain = await new BlockchainModel({difficulty: 5});
+        }
+        console.log(chain);
+        //Note that the data is saved by the addTransaction func !
+        await chain.addTransaction(fromAddress, toAddress, amount);
+        console.log(fromAddress, toAddress, amount);
+        res.send({message:"Transaction added to the chain!"})
+        console.log('[+] TX added to the chain !');
+    })
 
     /**
      * <----------- DELETE REQUESTS ----------->
@@ -173,6 +207,16 @@ function routes(app){
         }
     })
 
+    router.delete('/blockchain',(req, res)=>{
+        try{
+            BlockchainModel.deleteIt();
+            console.log('[+] Blockchain deleted successfully !');
+            res.send({message: 'Blockchain deleted successfully'})
+        }
+        catch(err){
+            console.error(err);
+        }
+    })
 
     /**
      * 
@@ -181,17 +225,6 @@ function routes(app){
      * 
      * 
      */
-
-
-
-
-
-
-
-    app.get('*', (req, res)=>{
-        res.status(404).send({message:'Page 404 not found'})
-    })
-
     //Externalizing the created API to the app
     app.use('/',router);
 };

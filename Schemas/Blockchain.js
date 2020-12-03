@@ -198,12 +198,26 @@ BlockchainSchema.methods.refresh = async function(){
  BlockchainSchema.statics.displayAll = async ()=>{
      try{
          const data = await BlockchainModel.find({});
-         return data;
+         return data.length === 0? null: data[0];
      }
      catch(err){
          console.error("Can't retrieve the blockchain ...");
      }
  }
+
+ /**
+  * Deleting all the blockchain
+  */
+ BlockchainSchema.statics.deleteIt = async ()=>{
+    //{} means ALL
+    try{
+        await BlockchainModel.deleteMany({});
+    }
+    catch(err){
+        return console.error(err);
+    }
+}
+
 
 const BlockchainModel = mongoose.model('Blockchain', BlockchainSchema);
 
