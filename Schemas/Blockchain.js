@@ -33,7 +33,7 @@ const BlockchainSchema = new mongoose.Schema({
 })
 /**
  * Hook function to fill the first genesis block when the blockchain is created
- * Used only and only for genesis block
+ * Used only and only for genesis block !!! other cases will be ignored
  */
 BlockchainSchema.pre("save",async function(next){
     try{
@@ -55,24 +55,23 @@ BlockchainSchema.pre("save",async function(next){
 })
 
 /**
- * 
+ * Very useful action, worth the func
  */
 BlockchainSchema.methods.getLatestBlock = async function(){
     return this.chain[this.chain.length-1];
 }
 
 /**
- * 
+ * Simply push the transaction to the pendingArray
+ * Note that caller must call refresh func after calling this func
+ * @param {fromAddress user type - (U = Users or M = Miners)} op1
+ * @param {toAddress user type - (U = Users or M = Miners)} op2
  */
-BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress, amount){
-    /**
-     * Simply push the transaction to the pendingArray
-     * Note that caller must call refresh func after calling this func
-     */
+BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress, amount, op1, op2){
     try{
-        await this.pendingTransactions.push({fromAddress, toAddress, amount});
+        await this.pendingTransactions.push({fromAddress, toAddress, amount,externalModelType1: (op1 === 'U'?'Users':'Miners'),
+                                            externalModelType2:(op2 === 'U'?'Users':'Miners')});
         await this.save();
-        console.log('[***] Transaction added to pending transactions ...');
     }
     catch(err){ 
         console.error(err);
@@ -97,15 +96,14 @@ BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress
             console.log('[!] There are no pending TXs !');
             return;
         } 
-        /*********************************************************************** */
         if(this.currentBlock === null){
             this.currentBlock = new BlockModel({transactions:[], prevHash:this.getLatestBlock().hash})
         }
-        const res = await this.currentBlock.addTransaction(pendedTX.fromAddress, pendedTX.toAddress, pendedTX.amount);
+        const res = await this.currentBlock.addTransaction(pendedTX.fromAddress, pendedTX.toAddress, pendedTX.amount,'U','U');
         if(res === false)//We need to mine the current block and progress
         {
             //The TX which rewards the miner
-            await this.currentBlock.addTransaction(minerAddress, minerAddress,0);
+            await this.currentBlock.addTransaction(minerAddress, minerAddress,0,'M','M');
             //We got 4 transactions !
             await this.currentBlock.mineBlock(this.difficulty);
             await this.chain.push(this.currentBlock);
@@ -117,15 +115,8 @@ BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress
         }
     }
 }
-/**
- * Helper method:
- * @param {The array to be hashed}
- * @returns {The hash of the current block}
- */
-
 
 /**
- * 
  * @returns {The first pending TX and remove it, if there are no pending TXs, then returns false} 
  */
 BlockchainSchema.methods.popFirstPendingTX = async function(){

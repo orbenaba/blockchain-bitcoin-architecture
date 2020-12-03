@@ -3,7 +3,7 @@ const {BlockModel, BlockSchema} = require('./Block');
 const {BlockchainModel, BlockchainSchema} = require('./Blockchain');
 const mongoose = require('../Backend/node_modules/mongoose');
 const { UserModel,UserSchema } = require('./Users');
-const { errorMonitor } = require('stream');
+const {MinerModel, MinerSchema} = require('./Miners');
 
 
 const db = require('../Schemas/keysToRemote').MongoURI;
@@ -29,14 +29,49 @@ async function temp(){/*
 
     let user1 = await UserModel.addUser("moshe");
     let user2 = await UserModel.addUser("Itzik");
-    console.log(user1);
-    let tx = await new TransactionModel({fromAddress:user1,toAddress:user2,amount:300});
+    let miner3 = await MinerModel.addMiner('Ahmed');
+    let miner4 = await MinerModel.addMiner('Jamal');
+    console.log("miner3 = ", miner3);
+    console.log("miner4 = ", miner4);
+
+    let tx1 = await new TransactionModel({externalModelType1:'Users',externalModelType2:'Users',fromAddress:user1,toAddress:user2,amount:300});
     try{
-        await tx.save();
-        console.log(tx);
+        await tx1.save();
+        console.log(tx1);
     }catch(err){
         console.error(err);
     }
+
+
+    let tx2 = await new TransactionModel({externalModelType1:'Users',externalModelType2:'Miners',fromAddress:user1,toAddress:miner3,amount:300});
+    try{
+        await tx2.save();
+        console.log(tx2);
+    }catch(err){
+        console.error(err);
+    }
+
+    let tx3 = await new TransactionModel({externalModelType1:'Miners',externalModelType2:'Users',
+                                            fromAddress:miner3,toAddress:user2,amount:300});
+    try{
+        await tx3.save();
+        console.log(tx3);
+    }catch(err){
+        console.error(err);
+    }
+
+    let tx4 = await new TransactionModel({externalModelType1:'Miners',externalModelType2:'Miners',fromAddress:miner3,toAddress:miner4,amount:300});
+    try{
+        await tx4.save();
+        console.log(tx4);
+    }catch(err){
+        console.error(err);
+    }
+
+
+
+
+
     console.log("||||DONE||||");
 }
 

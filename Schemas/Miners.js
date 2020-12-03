@@ -2,7 +2,7 @@ const mongoose = require('../Backend/node_modules/mongoose');
 const EC = require('../Backend/node_modules/elliptic').ec;
 const ec = new EC('secp256k1');
 
-const MinersSchema = new mongoose.Schema({
+const MinerSchema = new mongoose.Schema({
     publicKey:{
         unique: true,
         type: String,
@@ -21,34 +21,35 @@ const MinersSchema = new mongoose.Schema({
 });
 
 
-//Basic functions to use with the DB
-MinersSchema.statics.addMiner = async (name)=>{
-    /**
-     * We need to assure that there are no more miners in the DB
-     * We supply singleton design pattern !
-     */
+/**
+ * We need to assure that there are no more miners in the DB
+ * We supply singleton design pattern !
+ */
+MinerSchema.statics.addMiner = async (name)=>{
     try{
-        Miners.findOne({},async (err, items)=>{
+        let flag = false;
+        MinerModel.findOne({},async (err, items)=>{
             if(items !== null){
                 //In case there has already a user, we just return him
                 console.log('[+] There is already a miner in the DB !');
+                flag = true;
                 return items;
             }
-            else{
-                const genKeys = ec.genKeyPair();
-                const publicKey = genKeys.getPublic('hex');
-                const privateKey = genKeys.getPrivate('hex');
-                let user = new Miners({publicKey, privateKey, name});
-                await user.save()
+        });
+        if(flag === false){
+            const genKeys = ec.genKeyPair();
+            const publicKey = genKeys.getPublic('hex');
+            const privateKey = genKeys.getPrivate('hex');
+            let miner = new MinerModel({publicKey, privateKey, name});
+            await miner.save()
                 .then(item =>{
                     console.log("Miner created !");
-                    return user;
                 })
                 .catch(err =>{
                     console.error("Error in saving miner credentials ...");
                 })
-            }
-        });
+            return miner.publicKey;
+        }
     }
     catch(err){
         console.error('[-] Error in retrieving data from the DB');
@@ -56,9 +57,9 @@ MinersSchema.statics.addMiner = async (name)=>{
 }
 
 //Retrieving all the rows from DB
-MinersSchema.statics.displayAll = async ()=>{
+MinerSchema.statics.displayAll = async ()=>{
     try{
-        const data = await Miners.find({});
+        const data = await MinerModel.find({});
         return data.toString().length == 0 ? null:data;
     }
     catch(err){
@@ -67,10 +68,10 @@ MinersSchema.statics.displayAll = async ()=>{
 }
 
 
-MinersSchema.statics.removeAll = async ()=>{
+MinerSchema.statics.removeAll = async ()=>{
     //{} means ALL
     try{
-        await Miners.deleteMany({});
+        await MinerModel.deleteMany({});
     }
     catch(err){
         return console.error("[-] Error removing all the rows in the schema ...");
@@ -78,6 +79,6 @@ MinersSchema.statics.removeAll = async ()=>{
 }
 
 
-const Miners = mongoose.model('Miners', MinersSchema);
+const MinerModel = mongoose.model('Miners', MinerSchema);
 
-module.exports = Miners;
+module.exports = {MinerSchema, MinerModel};

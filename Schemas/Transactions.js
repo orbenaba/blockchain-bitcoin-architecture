@@ -11,16 +11,26 @@ const ec = new EC('secp256k1');
  * @timestamp {*The date of the committed transaction}
  */
 const TransactionSchema = new mongoose.Schema({
+    //used for the fromAddress - User/Miner
+    externalModelType1:{
+        type:String
+    },
+    //used for the toAddress - User/Miner
+    externalModelType2:{
+        type:String
+    },
+
     fromAddress:{
         type: String,
-        ref:'Users',
+        refPath:'externalModelType1',
         required: true
     },
     toAddress:{
         type: String,
-        ref:'Users',
+        ref:'externalModelType2',
         required: true
     },
+
     amount:{
         type: Number,
         required: true
