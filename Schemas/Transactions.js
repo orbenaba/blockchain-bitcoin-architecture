@@ -1,3 +1,4 @@
+const { sign } = require('crypto');
 const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
 const mongoose = require('../Backend/node_modules/mongoose');
 const EC = require('../Backend/node_modules/elliptic').ec;
@@ -39,12 +40,20 @@ const TransactionSchema = new mongoose.Schema({
         type: Date,
         required: true,
         default: Date.now()
-    }
-    /*signature:{
+    },
+    signature:{
         type: String,
-        required: true
-    }*/
+        required: false
+    }
 });
+/**
+ * Adding hook in order to add the signature right before the TX is saved in the DB
+ */
+TransactionSchema.pre("save",async function(next){
+    this.signTransaction(this.fromAddress);
+    console.log("[+] TX signed !");
+})
+
 
 
 TransactionSchema.methods.calculateHash = async function(){
@@ -53,18 +62,19 @@ TransactionSchema.methods.calculateHash = async function(){
 
 /**
  * Sign the hash of the transaction with the private key
- * @param {The user who wants to sign the transaction} signingKey
+ * @param {The user - private key - who wants to sign the transaction} signingKey
  * @returns {The signed Transaction hash string} this.signature
  */
 TransactionSchema.methods.signTransaction = async function(signingKey){
     //Checking whether someone is trying to spoof to the another wallet
     //Denote that public key is the address of the user
-    if(signingKey.getPublic('hex') !== this.fromAddress){
-        throw new Error("You can't sign transaction for other wallet");
+    if(signingKey !== this.fromAddress){
+        console.error("[-] You can't sign transaction for other wallet");
+        return;
     }
-    const hashTx = this.methods.calculateHash();
+    const hashTx = await this.calculateHash();
     //sign in base64
-    const signed = signingKey.sign(hashTx,'base64');
+    const signed = await ec.sign(hashTx,signingKey)
     //toDer() means that 'hex' is the format of the signature
     this.signature = signed.toDER('hex');
     return this.signature;
@@ -78,9 +88,9 @@ TransactionSchema.methods.isValid = async function(){
     if(this.fromAddress === null){
         return true;
     }
-    /*if(!this.signature || this.signature === 0){
+    if(!this.signature || this.signature === 0){
         throw new Error("[-] There is no signature for this transaction");
-    }*/
+    }
     const publicKey = await ec.keyFromPublic(this.fromAddress,'hex');
     //We decrypt the signature with the publicKey and then compare it to the this.calculateHash()
     return await publicKey.verify(this.calculateHash(), this.signature);

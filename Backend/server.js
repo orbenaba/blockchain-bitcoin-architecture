@@ -20,7 +20,7 @@ const app = express();
 app.use(cors(corsOptions));
 //parse requests of content type - application/json
 app.use(json());
-//parse 
+//parse
 app.use(urlencoded({ extended: true}));
 
 //Setting routes to the express server
@@ -31,12 +31,7 @@ routes(app);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
 /*
- // P2P network which has 3 nodes:
- // one is miner(The one who owns the mempool DB)
- // the other are simple
 const topology = require('fully-connected-topology');
-const {Blockchain} = require('./Blockchain');
-const {Transaction} = require('./Transaction')
 
 //Building the network
 
