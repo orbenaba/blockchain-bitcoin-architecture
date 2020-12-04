@@ -1,12 +1,10 @@
 const mongoose = require('../Backend/node_modules/mongoose');
-const TXSchema = require('./Transactions').TransactionSchema;
-const TXModel = require('./Transactions').Transactions;
 const SHA256 = require('../Backend/node_modules/crypto-js/sha256');
-const { TransactionModel } = require('./Transactions');
+const { TransactionModel, TransactionSchema } = require('./Transactions');
 const {MerkleTreeModel,MerkleTreeSchema} = require('./MerkleTree');
 const { UserModel } = require('./Users');
 const {MinerModel, MinerSchema} = require('./Miners');
-
+const {BloomFilterModel, BloomFilterSchema} = require('./BloomFilter');
 
 const MAX_TX_PER_BLOCK = 4;
 
@@ -27,7 +25,7 @@ const BlockSchema = new mongoose.Schema({
         required: true,
         default:Date.now()
     },
-    transactions:[TXSchema],
+    transactions:[TransactionSchema],
     prevHash:{
         type: String,
         required: false
@@ -44,11 +42,11 @@ const BlockSchema = new mongoose.Schema({
     },
     merkleTree:{
         type: MerkleTreeSchema
-    }/*,
+    },
     bloomFilter:{
-        type:PartitionedBloomFilter,
-        default: new PartitionedBloomFilter(2048, 1024)
-    }*/
+        type:BloomFilterSchema,
+        default: new BloomFilterModel(),
+    }
 });
 
 
@@ -118,13 +116,12 @@ BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amou
         console.log(`[-] From Address has no enough money, he has: ${u1.money} and tried to transfer: ${amount}`);
         return;
     }
-    if(u1 === 'U' ^ u2 === 'U'){
+    if(u1 === 'U' && u2 === 'U'){
         u1.money -= amount;
         u2.money +=amount;
         await u1.save();
         await u2.save();
     }
-
 
     const total = await this.transactions.length;
     let flag = (total != MAX_TX_PER_BLOCK - 2);
@@ -133,10 +130,13 @@ BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amou
         if(this.transactions.length === 0){
             this.transactions = await [inserted];
             this.merkleTree = await new MerkleTreeModel(inserted);
+            console.log("\n\n\nstrings =",fromAddress+toAddress+amount.toString()+timestamp.toString(),"\n\n\n");
+            await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
             await this.save();
         }
         else{
             await this.merkleTree.addTransaction(inserted);
+            await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
             await this.transactions.push(inserted);
         }
     }catch(err){

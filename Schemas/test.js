@@ -4,7 +4,14 @@ const {BlockchainModel, BlockchainSchema} = require('./Blockchain');
 const mongoose = require('../Backend/node_modules/mongoose');
 const { UserModel,UserSchema } = require('./Users');
 const {MinerModel, MinerSchema} = require('./Miners');
+/**
+ * 
+ */
+const { BloomFilterModel } = require('./BloomFilter');
 
+/**
+ * 
+ */
 
 const db = require('../Schemas/keysToRemote').MongoURI;
 mongoose.connect(db, {useNewUrlParser: true})
@@ -60,7 +67,6 @@ async function temp(){
     console.log("user3 = ",user3);
     console.log("user4 = ",user4);
     console.log("miner = ",miner);
-
 }
 
 temp();
