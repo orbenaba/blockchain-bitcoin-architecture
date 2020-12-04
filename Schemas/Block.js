@@ -42,11 +42,11 @@ const BlockSchema = new mongoose.Schema({
     },
     merkleTree:{
         type: MerkleTreeSchema
-    },
+    }/*,
     bloomFilter:{
         type:BloomFilterSchema,
         default: new BloomFilterModel(),
-    }
+    }*/
 });
 
 
@@ -130,13 +130,12 @@ BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amou
         if(this.transactions.length === 0){
             this.transactions = await [inserted];
             this.merkleTree = await new MerkleTreeModel(inserted);
-            console.log("\n\n\nstrings =",fromAddress+toAddress+amount.toString()+timestamp.toString(),"\n\n\n");
-            await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
+            //await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
             await this.save();
         }
         else{
             await this.merkleTree.addTransaction(inserted);
-            await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
+            //await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
             await this.transactions.push(inserted);
         }
     }catch(err){

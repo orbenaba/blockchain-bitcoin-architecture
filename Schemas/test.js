@@ -20,7 +20,7 @@ mongoose.connect(db, {useNewUrlParser: true})
 
 
 async function temp(){
-    /*let chain = await new BlockchainModel({difficulty: 2});
+    /*let chain = await BlockchainModel.blockchainCreator({difficulty: 2});
     let user1 = await UserModel.addUser("MalayGay");
     let user2 = await UserModel.addUser("OmerHacker");
     let user3 = await UserModel.addUser("AmitNashnash");
@@ -43,7 +43,7 @@ async function temp(){
     console.log("(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)");
     console.log(await chain.getBalanceOfAddress("1"));
     console.log("||||DONE||||");*/
-    let chain = await new BlockchainModel({difficulty: 2});
+    let chain = await BlockchainModel.blockchainCreator(2);
     let user1 = await UserModel.addUser("MalayGay",100);
     let user2 = await UserModel.addUser("OmerHacker",200);
     let user3 = await UserModel.addUser("AmitNashnash",300);
@@ -67,6 +67,7 @@ async function temp(){
     console.log("user3 = ",user3);
     console.log("user4 = ",user4);
     console.log("miner = ",miner);
+
 }
 
 temp();

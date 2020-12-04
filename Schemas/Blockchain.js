@@ -32,6 +32,23 @@ const BlockchainSchema = new mongoose.Schema({
         default: null
     }
 })
+
+/**
+ * Used as a wrapper in order to establish singleton design - THERE IS ONLY ONE BLOCKCHAIN !-!-!
+ */
+BlockchainSchema.statics.blockchainCreator = async function(difficulty){
+    const existed = await BlockchainModel.getExisting();
+    if(existed === null){
+        return new BlockchainModel({difficulty});
+    }
+    else{
+        return existed;
+    }
+}
+
+
+
+
 /**
  * Hook function to fill the first genesis block when the blockchain is created
  * Used only and only for genesis block !!! other cases will be ignored
@@ -185,6 +202,26 @@ BlockchainSchema.methods.isChainValid = async function(){
     }
     return true;
 }
+/**
+ * When we receive a new chain which is valid and longer than ours,
+ * we must use that chain and discard our chain,
+ *  more formally we must replace our chain with the new longer chain
+ */
+BlockchainSchema.methods.replaceChain = async function(otherChain){
+    if(otherChain.chain.length <= this.chain.length){
+        console.log("[-] Received chain is not longer than the current chain");
+        return;
+    }
+    else if(! (await otherChain.isChainValid())){
+        console.log("[-] Received chain is invalid");
+        return;
+    }
+    console.log("[+] Replacing the current chain with the new one");
+    this.chain = otherChain;
+    await this.save();
+}
+
+
 
 /**
  * Re-retrieve the data from the DB 
@@ -223,6 +260,22 @@ BlockchainSchema.methods.refresh = async function(){
     }
     catch(err){
         return console.error(err);
+    }
+}
+/**
+ * Getting the blockchain from the database, keeping on singleton pattern
+ */
+
+BlockchainSchema.statics.getExisting = async()=>{
+    try{
+        const data = await BlockchainModel.find({});
+        console.log(data);
+        if(data.length === 0) {
+            return null;
+        }
+        return data[0];
+    }catch(err){
+        console.error(err);
     }
 }
 

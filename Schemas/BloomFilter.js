@@ -10,11 +10,12 @@ const BloomFilterSchema = new mongoose.Schema({
         default:16
     },
     buckets:{
-        type:[String] ,
+        type:[Number] ,
         required: false
     },
     _locations:{
         type:[Number],
+        default:null,
         required:true
     }
 });
@@ -22,13 +23,17 @@ const BloomFilterSchema = new mongoose.Schema({
 //Hook
 BloomFilterSchema.pre("save",async function(next){
     //Rounding m to the nearest multiple of 32
-    var n = Math.ceil(this.m / 32), i = -1;
-    this.m = n*32;
-    var kbytes = 1 << Math.ceil(Math.log(Math.ceil(Math.log(this.m) / Math.LN2 / 8)) / Math.LN2);
-    var array = kbytes === 1 ? Uint8Array : kbytes === 2 ? Uint16Array : Uint32Array
-    var kbuffer = new ArrayBuffer(kbytes * this.k)
-    var buckets = this.buckets = new Int32Array(n);
-    this._locations = new array(kbuffer);
+    if(this._locations === null){
+        var n = Math.ceil(this.m / 32), i = -1;
+        this.m = n*32;
+        var kbytes = 1 << Math.ceil(Math.log(Math.ceil(Math.log(this.m) / Math.LN2 / 8)) / Math.LN2);
+        var array = kbytes === 1 ? Uint8Array : kbytes === 2 ? Uint16Array : Uint32Array
+        var kbuffer = new ArrayBuffer(kbytes * this.k)
+        var buckets = this.buckets = new Int32Array(n);
+        this._locations = new array(kbuffer);
+        console.log("Y".repeat(100));
+    }
+    next();
 })
 
 BloomFilterSchema.methods.locations = async function(v){
@@ -60,18 +65,19 @@ BloomFilterSchema.methods.test = async function(v) {
 };
 
 //Adding an item to the filter
-BloomFilterSchema.methods.add = function(v) {
+BloomFilterSchema.methods.add = async function(v) {
     var l = this.locations(v + ""),
         k = this.k,
         buckets = this.buckets;
-    for (var i = 0; i < k; ++i) buckets[Math.floor(l[i] / 32)] |= 1 << (l[i] % 32);
+    for (var i = 0; i < k; ++i) 
+            this.buckets[Math.floor(l[i] / 32)] |= 1 << (l[i] % 32);
 };
 
  // Estimated cardinality.
  BloomFilterSchema.methods.size = function() {
     var buckets = this.buckets,
         bits = 0;
-    for (var i = 0, n = buckets.length; i < n; ++i) bits += popcnt(buckets[i]);
+    for (var i = 0, n = this.buckets.length; i < n; ++i) bits += popcnt(this.buckets[i]);
     return -this.m * Math.log(1 - bits / this.m) / this.k;
   };
 
@@ -112,6 +118,21 @@ function fnv_mix(a) {
     a += a << 5;
     return a & 0xffffffff;
 }
+
+
+/**
+ * Re-retrieve the data from the DB 
+ */
+BloomFilterSchema.methods.refresh = async function(){
+    try{
+       const returned = await BloomFilterModel.findById(this._id);
+       return returned;
+   }
+   catch(err){
+       console.error(err);
+   }
+}
+
 
 const BloomFilterModel = mongoose.model('BloomFilters', BloomFilterSchema);
 
