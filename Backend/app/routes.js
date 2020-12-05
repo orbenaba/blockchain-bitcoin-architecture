@@ -156,16 +156,9 @@ function routes(app){
             return;
         }
         //Adding here validation
-
-        //Checking if the blockchain has already been created
-        let chain = await BlockchainModel.displayAll();
-        if(chain === null){
-            chain = await new BlockchainModel({difficulty: 5});
-        }
-        console.log(chain);
+        let chain = await BlockchainModel.blockchainCreator({difficulty:5});
         //Note that the data is saved by the addTransaction func !
         await chain.addTransaction(fromAddress, toAddress, amount);
-        console.log(fromAddress, toAddress, amount);
         res.send({message:"Transaction added to the chain!"})
         console.log('[+] TX added to the chain !');
     })
@@ -206,7 +199,8 @@ function routes(app){
             console.error('[-] Error occurred while deleting Miners ...');
         }
     })
-
+    
+    
     router.delete('/blockchain',(req, res)=>{
         try{
             BlockchainModel.deleteIt();
@@ -228,5 +222,8 @@ function routes(app){
     //Externalizing the created API to the app
     app.use('/',router);
 };
+
+
+ 
 
 module.exports = routes;
