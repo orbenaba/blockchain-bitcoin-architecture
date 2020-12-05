@@ -208,7 +208,6 @@ BlockchainSchema.methods.isChainValid = async function(){
  *  more formally we must replace our chain with the new longer chain
  */
 BlockchainSchema.methods.replaceChain = async function(otherChain){
-    console.log("otherChain = ",otherChain);
     if(otherChain.length <= this.chain.length){
         console.log("[-] Received chain is not longer than the current chain");
         return;

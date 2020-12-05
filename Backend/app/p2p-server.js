@@ -1,74 +1,115 @@
 const WebSocket = require('../node_modules/ws');
-const {P2PNumberizerModel,HTTPNumberizerModel} = require('./Numberizer');
+const net = require('net');
 
 
-
-//list of address to connect to
-const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
-
+const {UserModel} = require('../../Schemas/Users');
+const {CurrentActiveModel, CurrentActiveSchema} = require('./CurrentActive');
+const portscanner = require('portscanner');
+//process.on('uncaughtException',function(err){console.error("Errorrrrrrrrr:",err);})
 
 class P2pserver{
     constructor(blockchain, P2P_PORT){
+        console.log("p2p server was called !");
         this.blockchain = blockchain;
         this.sockets = [];
         this.P2P_PORT = P2P_PORT;
+        this.peers = null;
+    }
+
+    //after making connection to a socket
+    async connectionSocket(socket){
+        //push the socket to the socket array
+        await this.sockets.push(socket);
+        console.log('Socket connected');
+
+        //register a message event listener to the socket
+        await this.messageHandler(socket);
+
+        //on new connection send the blockchain chain to the peer
+        await this.sendChain(socket);
     }
 
     //create a new p2p server and connections
-    listen(){
+    async listen(){
         //create the p2p server with port as argument
-        const server = new WebSocket.Server({port: this.P2P_PORT});
-
-        //event listener and a callback function for any new connection
-        //on any new connection the current instance will send the current chain
-        //to the newly connected peer
-        server.on('connection', socket => this.connectionSocket(socket));
-
-        //to connect to the peers that we have specified
-        this.connectionToPeers();
+        const server = await new WebSocket.Server({port: this.P2P_PORT});
+        this.peers = await this.peersGenerator();
+        server.on('connection',(socket) =>{
+            this.connectionSocket(socket)
+        })
+        
+        if(this.peers !== null){
+            await this.connectionToPeers();
+        }
+        await CurrentActiveModel.addPort(this.P2P_PORT);
 
         console.log(`Listening for peer to peer connection on port: ${this.P2P_PORT}`);
     }
 
-
-    //after making connection to a socket
-    connectionSocket(socket){
-        //push the socket to the socket array
-        this.sockets.push(socket);
-        console.log('Socket connected');
-
-        //register a message event listener to the socket
-        this.messageHandler(socket);
-
-        //on new connection send the blockchain chain to the peer
-        this.sendChain(socket);
+    /**
+     * Trying to connect to the whole Distributed network, who answers is welcome
+     */
+    async peersGenerator(){
+        //How many peers at the most our network has?
+        /*const amount = await UserModel.usersAmount();
+        let peers = [];
+        for(let i=0;i<amount;i++){
+            peers.push(`ws://localhost:${this.P2P_PORT+i}`);
+        }
+        return peers;*/
+        const data = await CurrentActiveModel.getActives();
+        if(data !== null){
+            let peers = [];
+            for(let i=0;i<data.length;i++){
+                peers.push(`ws://localhost:${data[i]}`);
+            }
+            return peers;
+        }
+        return null;
     }
 
-    connectionToPeers(){
-        //connect to each peer
-        peers.forEach(peer=>{
-            //create a socket for each peer
-            const socket = new WebSocket(peer);
 
+
+    async connectionToPeers(){
+        //connect to each peer
+        this.peers.forEach(async (peer)=>{
+            //create a socket for each peer
+            const socket = await new WebSocket(peer);
             //open event listener is emitted when a connection is established
             //saving the socket in the array
-            socket.on('open', ()=>this.connectionSocket(socket));
+            const p = await Number(peer.slice(15,20));
+            if(p !== this.P2P_PORT){
+                try{
+                    const status = await portscanner.checkPortStatus(p, '127.0.0.1');
+                    console.log("status =",status);
+                    if(status === 'open'){
+                        console.log("Port is opened !", p);
+                        await socket.on('open', async()=>{await this.connectionSocket(socket)});
+                    }
+                    else{
+                        console.log("Port is closed !", p);
+                    }
+                }
+                catch(err){
+                    console.error(err);
+                }        
+            }
         })
     }
 
-    messageHandler(socket){
+    async messageHandler(socket){
         //On receiving message execute a callback function
-        socket.on('message', message=>{
+        await socket.on('message', message=>{
             const data = JSON.parse(message);
             this.blockchain.replaceChain(data);
         })
     }
 
-    sendChain(socket){
-        socket.send(JSON.stringify(this.blockchain.chain))
+    async sendChain(socket){
+        await socket.send(JSON.stringify(this.blockchain.chain))
     }
-    syncChain(){
-        this.sockets.forEach(socket=>{
+    async syncChain(){
+        await this.sockets.forEach(socket=>{
             this.sendChain(socket);
         })
     }

@@ -3,6 +3,8 @@
  * Unique port is given to each user
  */
 const mongoose = require('mongoose');
+const {P2P_BASIS, HTTP_BASIS} = require('../../CONSTANTS');
+
 /**
  * Time expires each 30 minutes
  */
@@ -20,7 +22,7 @@ P2PNumberizerSchmea.statics.getIndex = async function(){
         const i = await P2PNumberizerModel.findOne({});
         if(i === null){
             //generating new one
-            const index = await new P2PNumberizerModel({index:5000});
+            const index = await new P2PNumberizerModel({index:P2P_BASIS});
             await index.save();
             return index.index;
         }
@@ -51,7 +53,7 @@ HTTPNumberizerSchmea.statics.getIndex = async function(){
         const i = await HTTPNumberizerModel.findOne({});
         if(i === null){
             //generating new one
-            const index = await new HTTPNumberizerModel({index:3000});
+            const index = await new HTTPNumberizerModel({index:HTTP_BASIS});
             await index.save();
             return index.index;
         }
