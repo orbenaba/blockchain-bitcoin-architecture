@@ -102,6 +102,14 @@ UserSchema.statics.getMoneyByPublic = async(publicKey)=>{
     }
 }
 
+/**
+ * Counting the total users in the DB 
+ 
+UserSchema.statics.usersAmount = async function(){
+    UserModel.count({});
+}*/
+
+
 const UserModel = mongoose.model('Users', UserSchema);
 
 module.exports = {UserModel, UserSchema};

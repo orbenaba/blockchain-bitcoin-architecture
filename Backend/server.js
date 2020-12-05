@@ -1,4 +1,3 @@
-const HTTP_PORT = process.env.HTTP_PORT || 3001;
 //Routing
 const express = require('express');
 const routes =  require('./app/routes');
@@ -20,13 +19,16 @@ mongoose.connect(db, {useNewUrlParser: true})
  */
 const P2pserver = require('./app/p2p-server');
 const { BlockchainModel } = require('../Schemas/Blockchain');
-
+const {HTTPNumberizerModel, P2PNumberizerModel} = require('./app/Numberizer')
 
 async function main(){
 
+    //declare the peer to peer server port
+    const P2P_PORT = await P2PNumberizerModel.getIndex();
+    console.log("P2P_PORT = ",P2P_PORT);
     //get the blockchain from the DB
     const blockchain = await BlockchainModel.blockchainCreator();
-    const p2pserver = new P2pserver(blockchain);
+    const p2pserver = new P2pserver(blockchain, P2P_PORT);
 
     /**
      * HTTP server
@@ -46,9 +48,10 @@ async function main(){
     //Setting routes to the express server
     routes(app);
 
-
     //connecting the server
+    const HTTP_PORT = await HTTPNumberizerModel.getIndex();
     app.listen(HTTP_PORT, console.log(`Server started on port ${HTTP_PORT}`));
+
 
     p2pserver.listen();
 

@@ -12,6 +12,9 @@ const { BloomFilterModel } = require('./BloomFilter');
 /**
  * 
  */
+const {NumberizerModel, NumberizerSchema} = require('../Backend/app/Numberizer');
+
+
 
 const db = require('../Schemas/keysToRemote').MongoURI;
 mongoose.connect(db, {useNewUrlParser: true})
@@ -43,7 +46,7 @@ async function temp(){
     console.log("(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)(DONE)");
     console.log(await chain.getBalanceOfAddress("1"));
     console.log("||||DONE||||");*/
-    let chain = await BlockchainModel.blockchainCreator(2);
+    /*let chain = await BlockchainModel.blockchainCreator(2);
     let user1 = await UserModel.addUser("MalayGay",100);
     let user2 = await UserModel.addUser("OmerHacker",200);
     let user3 = await UserModel.addUser("AmitNashnash",300);
@@ -66,8 +69,14 @@ async function temp(){
     console.log("user2 = ",user2);
     console.log("user3 = ",user3);
     console.log("user4 = ",user4);
-    console.log("miner = ",miner);
-
+    console.log("miner = ",miner);*/
+    let i1 = await NumberizerModel.getIndex();
+    console.log(i1);
+    let i2 = await NumberizerModel.getIndex();
+    console.log(i1);
+    let i3 = await NumberizerModel.getIndex();
+    console.log(i1);
+    
 }
 
 temp();
