@@ -8,6 +8,7 @@ const {UserModel, UserSchema} = require('../../Schemas/Users');
 const {TransactionModel, TransactionSchema} = require('../../Schemas/Transactions');
 const { BlockModel, BlockSchema } = require('../../Schemas/Block');
 const {BlockchainModel,BlockchainSchema} = require('../../Schemas/Blockchain');
+const { runInNewContext } = require('vm');
 
 
 function routes(app){
@@ -122,18 +123,18 @@ function routes(app){
     })
 
     //Adding new miner
-    router.post('/miner', (req,res)=>{
+    router.post('/miner',async (req,res)=>{
         //Validating the request
-        if(!req.body.name){
-            res.status(400).send({message: "You must give a name to the miner !"});
+        if(!req.body.name || !req.body.money){
+            res.status(400).send({message: "You must give a name & money to the miner !"});
         }
         else{
             /**
              * Saving a TX
              * Note that [publicKey, privateKey] is generated and saved automatically
              */
-            MinerModel.addMiner(req.body.name)
-            res.send({message:'Miner added successfully !!!'})
+            const data = await MinerModel.addMiner(req.body.name, req.body.money)
+            res.send(data)
         }
     })
     /**

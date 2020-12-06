@@ -22,7 +22,7 @@ const P2pserver = require('./app/p2p-server');
 const { BlockchainModel } = require('../Schemas/Blockchain');
 const {HTTPNumberizerModel, P2PNumberizerModel} = require('./app/Numberizer')
 
-async function main(){
+/*async function main(){
     //get the blockchain from the DB
     const blockchain = await BlockchainModel.blockchainCreator();
     //declare the peer to peer server port
@@ -53,7 +53,29 @@ async function main(){
                                             p2pserver.listen();                    
                                         })
                     })
+}*/
+
+
+async function main(){
+    //express config
+    var corsOptions = { 
+        origin: "http://localhost:3000"
+    };
+    const app = express();
+    app.use(cors(corsOptions));
+    //parse requests of content type - application/json
+    app.use(json());
+    //parse
+    app.use(urlencoded({ extended: true}));
+
+    //Setting routes to the express server
+    routes(app);
+    const port2 = 4000;
+    //connecting the server
+    app.listen(port2, console.log(`Server started on port ${port2}`));
 }
+
+
 
 
 

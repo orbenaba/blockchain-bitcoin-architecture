@@ -29,6 +29,7 @@ const MinerSchema = new mongoose.Schema({
  * We need to assure that there are no more miners in the DB
  * We supply singleton design pattern !
  */
+
 MinerSchema.statics.addMiner = async (name, money)=>{
     try{
         const items = await MinerModel.findOne({});
@@ -48,7 +49,7 @@ MinerSchema.statics.addMiner = async (name, money)=>{
             .catch(err =>{
                 console.error("Error in saving miner credentials ...");
             })
-        return miner.publicKey;
+        return miner;
     }
     catch(err){
         console.error('[-] Error in retrieving data from the DB');
@@ -59,7 +60,7 @@ MinerSchema.statics.addMiner = async (name, money)=>{
 MinerSchema.statics.displayAll = async ()=>{
     try{
         const data = await MinerModel.find({});
-        return data.toString().length == 0 ? null:data;
+        return data.length === 0 ? null:data[0];
     }
     catch(err){
         console.log('[-] Error displaying all the schema');

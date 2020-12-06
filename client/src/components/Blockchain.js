@@ -13,9 +13,12 @@ export default class Blockchain extends Component {
 
     render() {
         return (
-            <div>
-                
+            <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
+                    
+                </div>
             </div>
+
         )
     }
 }

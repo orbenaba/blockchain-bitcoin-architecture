@@ -19,7 +19,7 @@ export default class Users extends Component {
             money:1000
         }
     }
-    /**
+    /**`
      * This methods are called before the page is loaded 
      */
     componentDidMount(){
@@ -72,9 +72,7 @@ export default class Users extends Component {
 
     render() {
         return (
-            <div>
-                <h1>Users Component</h1>
-            </div>
+            <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}></div>
         )
     }
 }
