@@ -6,9 +6,7 @@ const {UserModel, UserSchema} = require('../../Schemas/Users');
 
 
 const {TransactionModel, TransactionSchema} = require('../../Schemas/Transactions');
-const { BlockModel, BlockSchema } = require('../../Schemas/Block');
 const {BlockchainModel,BlockchainSchema} = require('../../Schemas/Blockchain');
-const { runInNewContext } = require('vm');
 
 
 function routes(app){
@@ -89,6 +87,16 @@ function routes(app){
             res.send(data);
         }
     })
+
+
+
+
+
+
+
+
+
+
     /**
      * <----------- POST REQUESTS ----------->
      */
@@ -163,13 +171,31 @@ function routes(app){
  *          const data = await MinerModel.addMiner(req.body.name, req.body.money)
             res.send(data)
          */
-        let chain = await BlockchainModel.blockchainCreator(4);
+        let chain = await BlockchainModel.blockchainCreator(2);
         //Note that the data is saved by the addTransaction func !
         await chain.addTransaction(fromAddress, toAddress, amount);
         chain = await chain.refresh();
         res.send(chain)
         console.log('[+] TX added to the chain !');
     })
+
+
+    router.post('/mineblocks',async(req,res)=>{
+        let chain = await BlockchainModel.blockchainCreator(2);
+        const miner = req.body.publicKey;
+        await chain.miningPendingTransactions(miner);
+        res.send({message:"Block mined successfully"});
+    })
+
+
+
+
+
+
+
+
+
+
 
     /**
      * <----------- DELETE REQUESTS ----------->
@@ -211,7 +237,7 @@ function routes(app){
     
     router.delete('/blockchain',async (req, res)=>{
         try{
-            await BlockchainModel.deleteIt();
+            await BlockchainModel.deleteIt()
             console.log('[+] Blockchain deleted successfully !');
             res.send({message: 'Blockchain deleted successfully'})
         }

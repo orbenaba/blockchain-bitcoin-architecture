@@ -19,7 +19,7 @@ const BlockchainSchema = new mongoose.Schema({
     difficulty:{
         type: Number,
         required: true,
-        default:3
+        default:2
     },
     pendingTransactions:[TransactionSchema],
     miningReward:{

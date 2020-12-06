@@ -17,7 +17,8 @@ export default class Blockchain extends Component {
             miningReward: 100,
             fromAddress:'',
             toAddress:'',
-            amount:0
+            amount:0,
+            miner:{}
         }
     }
     async componentDidMount(){
@@ -30,6 +31,16 @@ export default class Blockchain extends Component {
                         pendingTransactions:res.data.pendingTransactions,
                         miningReward:res.data.miningReward
                     })
+                    //check out the miner
+                    axios.get('http://localhost:4000/miner')
+                            .then(res=>{
+                                if(typeof res.data.name !== 'undefined'){
+                                    this.setState({
+                                        miner:res.data
+                                    })
+                                }
+                                //else - no miner created yet
+                            })
                 }
                 //else - no blockchain created yet
             })
@@ -56,15 +67,11 @@ export default class Blockchain extends Component {
         }
         await axios.post('http://localhost:4000/blockchain',data)
             .then(res=>{
-                console.log(res)
                 this.setState({
                     chain:res.data.chain,
                     difficulty: res.data.difficulty,
                     pendingTransactions: res.data.pendingTransactions,
                     miningReward: res.data.miningReward,
-                    fromAddress:res.data.fromAddress,
-                    toAddress:res.data.toAddress,
-                    amount:res.data.amount
                 })
             })
             .catch(err=>console.error(err))
@@ -72,7 +79,6 @@ export default class Blockchain extends Component {
 
 
     async deleteBlockchain(e){
-        console.log("Deleted")
         await axios.delete('http://localhost:4000/blockchain')
             .then(res=>{
                 this.setState({
@@ -91,12 +97,19 @@ export default class Blockchain extends Component {
             })
     }
 
+    minePendingTXs = async()=>{
+        axios.post('http://localhost:4000/mineblocks',this.state.miner)
+            .then(res=>{
+                this.setState({
+
+                })
+            })
+    }
+
     render() {
-        console.log("this.state = ",this.state)
-        if(this.state.difficulty !== 0){
+        if(this.state.difficulty !== 0 && this.state.pendingTransactions.length >= 3){
             return (
                 <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
-
                 <h1>
                     Add transaction
                 </h1>
@@ -116,7 +129,31 @@ export default class Blockchain extends Component {
                             <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             <span><strong>Delete all the blockchain</strong></span>            
                         </button>
+
+                        <button type="submit" onClick={this.minePendingTXs} className="btn btn-primary a-btn-slide-text">
+                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
+                        </button>
                     </div>
+                </div>
+            )
+        }
+        else if(this.state.difficulty!==0){
+            return (
+                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                    <h1>
+                        Add transaction (the blockchain will be created automatically)
+                    </h1>
+                    <div>
+                        <form onSubmit={this.onSubmit}>
+                            <input type="text" name={this.state.fromAddress} className="formStyle" placeholder="From address - public key (required)" required onChange={e => this.onFromAddressChange(e.target.value)}/>
+                            <input type="text" name={this.state.toAddress} className="formStyle" placeholder="To address - public key (required)" required onChange={e =>this.onToAddressChange(e.target.value)}/>
+                            <input type="number" name={this.state.amount} className="formStyle" placeholder="Amount (required)" required onChange={e => this.onAmountChange(e.target.value)}></input>
+                            <button type="submit" className="formButton">Add</button>
+                        </form>
+                    </div>
+                    <h4 style={{color:'white'}}>Total pending TXs: {this.state.pendingTransactions.length}</h4>
+                    <h4 style={{color:'white'}}>* You need at least 3 TXs to the mining</h4>
                 </div>
             )
         }
