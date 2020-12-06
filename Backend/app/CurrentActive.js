@@ -8,7 +8,7 @@ const CurrentActiveSchema = new mongoose.Schema({
         //port numbers
         type:[Number],
         required:false,
-        expires:60//1 minutes
+        expires:30//1 minutes
     }
 },{timestamps: true})
 
@@ -42,7 +42,21 @@ CurrentActiveSchema.statics.addPort = async function(port){
     }
 }
 
-
+CurrentActiveSchema.statics.removePort = async function(port){
+    try{
+        let data = await CurrentActiveModel.findOne({});
+        if(data !== null){
+            const index = data.users.indexOf(port);
+            if(index !== -1){
+                await data.users.splice(index);
+                await data.save();
+                return true;    
+            }
+        }
+    }catch(err){
+        console.error(err);
+    }
+}
 
 
 const CurrentActiveModel = mongoose.model('CurrentActives',CurrentActiveSchema);

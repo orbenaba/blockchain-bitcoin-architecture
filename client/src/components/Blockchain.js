@@ -1,17 +1,16 @@
-/**
- * This component contain a chain of blocks
- */
 import React, { Component } from 'react'
-import {default as BLKCHAIN} from '../../Models/Blockchain';
+import {Link} from 'react-router-dom';
+import axios from 'axios';
 
 export default class Blockchain extends Component {
-    constructor(props)
-    {
+    constructor(props){
         super(props);
-        this.state={
-            blockchain:new BLKCHAIN()
-        }
+
     }
+    componentDidMount(){
+       // axios.get('http://localhost:5000/')
+    }
+
     render() {
         return (
             <div>

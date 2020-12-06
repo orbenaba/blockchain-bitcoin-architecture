@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 
 const {MinerModel, MinerSchema} = require('../../Schemas/Miners');
 const {UserModel, UserSchema} = require('../../Schemas/Users');
@@ -21,7 +22,8 @@ function routes(app){
      */
     app.get('/', (req, res)=>{
         console.log("[+] Main page loaded");
-        res.json({message: "Welcome to j00k3r c0in!"});
+       // res.json({message: "Welcome to j00k3r c0in!"});
+       res.sendFile(path.resolve(__dirname,'client','build','index.html'))
     })
     /**
      * Displaying the main page of the website, 

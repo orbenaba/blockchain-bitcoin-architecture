@@ -1,11 +1,8 @@
 const WebSocket = require('../node_modules/ws');
-const net = require('net');
 
 
-const {UserModel} = require('../../Schemas/Users');
 const {CurrentActiveModel, CurrentActiveSchema} = require('./CurrentActive');
 const portscanner = require('portscanner');
-//process.on('uncaughtException',function(err){console.error("Errorrrrrrrrr:",err);})
 
 class P2pserver{
     constructor(blockchain, P2P_PORT){
@@ -38,6 +35,8 @@ class P2pserver{
             this.connectionSocket(socket)
         })
         
+
+
         if(this.peers !== null){
             await this.connectionToPeers();
         }
@@ -50,13 +49,6 @@ class P2pserver{
      * Trying to connect to the whole Distributed network, who answers is welcome
      */
     async peersGenerator(){
-        //How many peers at the most our network has?
-        /*const amount = await UserModel.usersAmount();
-        let peers = [];
-        for(let i=0;i<amount;i++){
-            peers.push(`ws://localhost:${this.P2P_PORT+i}`);
-        }
-        return peers;*/
         const data = await CurrentActiveModel.getActives();
         if(data !== null){
             let peers = [];
@@ -75,6 +67,7 @@ class P2pserver{
         this.peers.forEach(async (peer)=>{
             //create a socket for each peer
             const socket = await new WebSocket(peer);
+
             //open event listener is emitted when a connection is established
             //saving the socket in the array
             const p = await Number(peer.slice(15,20));
@@ -85,6 +78,14 @@ class P2pserver{
                     if(status === 'open'){
                         console.log("Port is opened !", p);
                         await socket.on('open', async()=>{await this.connectionSocket(socket)});
+                        await socket.on('disconnect',async ()=> {
+                            console.log("!!!!!  OUT    !!!!!")
+                            let index = await this.peers.indexOf(Number(peer.slice(15,20)));
+                            if(index !== -1){
+                                this.peers.splice(index,1)
+                                await CurrentActiveModel.removePort(Number(peer.slice(15,20)))
+                            }
+                        })
                     }
                     else{
                         console.log("Port is closed !", p);
