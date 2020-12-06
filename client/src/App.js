@@ -12,7 +12,7 @@ import Miner from './components/Miner';
 
 function App() {
   return (
-    <div className="container">
+    <div className="container" style={{width:"1500px"}}>
       <Router>
             <Navbar></Navbar>  
             <Route path="/" exact component={Home}></Route>

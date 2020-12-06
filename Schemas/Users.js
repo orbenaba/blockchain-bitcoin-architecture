@@ -29,7 +29,6 @@ const UserSchema = new mongoose.Schema({
 
 /**
  * @param {The name which chose to be} name
- * @returns {The new public key of the user} 
  */
 UserSchema.statics.addUser = async (name,money)=>{
     const genKeys = ec.genKeyPair();
@@ -43,7 +42,7 @@ UserSchema.statics.addUser = async (name,money)=>{
         .catch(err =>{
             console.error("Error in saving the Data ...");
         })
-    return user.publicKey;
+    return user;
 }
 
 /**

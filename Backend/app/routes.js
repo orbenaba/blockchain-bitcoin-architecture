@@ -106,10 +106,10 @@ function routes(app){
     })
 
     //Adding new user
-    router.post('/users', (req,res)=>{
+    router.post('/users', async(req,res)=>{
        //Validating the request
        console.log(req.body);
-        if(!req.body.name){
+        if(!req.body.name || !req.body.money){
             res.status(400).send({message: "You must give a name to the user !"});
         }
         else{
@@ -117,8 +117,8 @@ function routes(app){
              * Saving a TX
              * Note that [publicKey, privateKey] is generated and saved automatically
              */
-            UserModel.addUser(req.body.name)
-            res.send({message:'User added successfully !!!'})
+            const data = await UserModel.addUser(req.body.name, req.body.money);
+            res.send(data)
         }
     })
 

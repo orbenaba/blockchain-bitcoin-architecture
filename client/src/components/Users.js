@@ -1,78 +1,140 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 
+ const User = props =>(
+     <tr style={{color:'white'}}>
+        <td>{props.userParam.name}</td>
+        <td>{props.userParam.money}</td>
+        <td>{props.userParam.publicKey}</td>
+        <td>{props.userParam.privateKey}</td>
+    </tr>
+ )
+
+
 export default class Users extends Component {
     constructor(props){
         super(props);
 
-        /**
-         * Binding this to the class
-         */
-        this.onChangeName = this.onChangeName.bind(this);
-        this.onChangeMoney = this.onMoneyChange.bind(this);
+
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state={
             publicKey:'',
             privateKey:'',
             name:'',
-            money:1000
+            money:1000,
+            oldUsers:[]
         }
     }
-    /**`
-     * This methods are called before the page is loaded 
-     */
+
     componentDidMount(){
-        axios.get('http://localhost:5000/users')
+        axios.get('http://localhost:4000/users')
         .then(res=>{
+            console.log("data",res.data)
             this.setState({
-                
+                oldUsers:res.data 
             })    
         })
+        .catch(err=>console.error(err))
     }
 
-    /**
-     * When the name is changed we wish to set the state of the component
-     */
-    onChangeName(e){
-        this.setState({
-            name:e.target.value
-        })
+    onNameChange = (name) =>{
+        this.setState({name});
     }
 
-    onMoneyChange(e){
-        this.setState({ 
-            money:e.target.money
-        })
+    onMoneyChange(money){
+        this.setState({money})
     }
-
-    onSubmit(e){
-        e.preventDefault();
-        const u ={
-            publicKey: this.state.publicKey,
-            privateKey: this.state.privateKey,
+    async onSubmit(e){
+        await e.preventDefault();
+        const data = {
             name: this.state.name,
             money: this.state.money
         }
-        /**
-         * Here we are keeping the user in the DB
-         */
-        axios.post('http://localhost:5000/users', u)
-            .then(res=>console.log(res.data))
-         /**
-         * Here we are keeping the user in the DB
-         */
-        this.setState({
-            publicKey:"",
-            privateKey:"",
-            money:"",
-            name:""
-        })        
+        await axios.post('http://localhost:4000/users',data)
+            .then(res=>{
+                console.log(res)
+                this.setState({
+                    publicKey:res.data.publicKey,
+                    privateKey:res.data.privateKey,
+                    name: res.data.name,
+                    money: res.data.money,
+                })
+            })
+            .catch(err=>console.error(err))
+    }
+
+    getUsersList =()=>{
+        return this.state.oldUsers.map(u => {
+            return <User userParam={u}></User>
+        })
+    }
+
+    deleteAll = ()=>{
+        axios.delete('http://localhost:4000/users')
+            .then(res=>{
+                this.setState({
+                    publicKey:'',
+                    privateKey:'',
+                    name:'',
+                    money:1000,
+                    oldUsers:[]
+                })
+            })
     }
 
     render() {
-        return (
-            <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}></div>
-        )
+        if(this.state.oldUsers.length !== 0){
+            return (           
+                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                    <h1>
+                        Add user
+                    </h1>
+                    <div>
+                        <form onSubmit={this.onSubmit}>
+                            <input type="text" name={this.state.name} className="formStyle" placeholder="Name (required)" required onChange={e => this.onNameChange(e.target.value)}/>
+                            <input type="number" name={this.state.money} className="formStyle" placeholder="Initial amount (required)" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                            <button type="submit" className="formButton">Create</button>
+                        </form>
+                    </div>
+    
+    
+                    <div>
+                        <table className="table">
+                            <thead className="thead-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Money</th>
+                                    <th>Wallet</th>
+                                    <th>private key</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {this.getUsersList()}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <button type="submit" onClick={this.deleteAll} className="formButton">Delete all users</button>
+                    </div>
+                </div>
+            )
+        }
+        else{
+            return(
+                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <h1>
+                    Add user
+                </h1>
+                <div>
+                    <form onSubmit={this.onSubmit}>
+                        <input type="text" name={this.state.name} className="formStyle" placeholder="Name (required)" required onChange={e => this.onNameChange(e.target.value)}/>
+                        <input type="number" name={this.state.money} className="formStyle" placeholder="Initial amount (required)" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                        <button type="submit" className="formButton">Create</button>
+                    </form>
+                </div>
+                </div>
+            )
+        }
     }
 }
