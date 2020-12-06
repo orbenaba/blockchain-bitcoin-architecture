@@ -1,3 +1,4 @@
+const { error } = require('console');
 const mongoose = require('../Backend/node_modules/mongoose');
 const EC = require('../Backend/node_modules/elliptic').ec;
 const ec = new EC('secp256k1');
@@ -112,6 +113,23 @@ UserSchema.statics.usersAmount = async function(){
         console.error(err);
     }
 }
+
+//queried is public key
+UserSchema.statics.isExist = async function(queried){
+    try{
+        //query by public key
+        console.log("GOT=>",queried.publicKey);
+        const res = await UserModel.findOne({publicKey: queried.publicKey});
+        console.log("Res=",res);
+        if(res !== null){
+            return true;
+        }
+        return false;
+    }catch(err){
+        console.error(err);
+    }
+}
+
 
 
 const UserModel = mongoose.model('Users', UserSchema);

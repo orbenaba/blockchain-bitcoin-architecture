@@ -148,7 +148,7 @@ function routes(app){
     /**
      * In the request we are getting a transaction
      * And then adding it to the DB\ creating a new blockchain
-     * The difficulty is 5 leading zeros 
+     * The difficulty is 2 leading zeros 
      */
     router.post('/blockchain',async(req,res)=>{
         const fromAddress = req.body.fromAddress;
@@ -167,10 +167,8 @@ function routes(app){
             return;
         }*/
         //Adding here validation
-        /**
- *          const data = await MinerModel.addMiner(req.body.name, req.body.money)
-            res.send(data)
-         */
+
+
         let chain = await BlockchainModel.blockchainCreator(2);
         //Note that the data is saved by the addTransaction func !
         await chain.addTransaction(fromAddress, toAddress, amount);
@@ -187,7 +185,17 @@ function routes(app){
         res.send({message:"Block mined successfully"});
     })
 
-
+    //queried is public key
+    router.post('/isuserexist',async(req,res)=>{
+        let queried = req.body;
+        const r = await UserModel.isExist(queried);
+        if(r === true){
+            res.send('true');
+        }
+        else{
+            res.send('false')
+        }
+    })
 
 
 

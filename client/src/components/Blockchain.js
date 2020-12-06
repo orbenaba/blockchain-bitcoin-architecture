@@ -65,16 +65,39 @@ export default class Blockchain extends Component {
             fromAddress: this.state.fromAddress,
             toAddress: this.state.toAddress
         }
-        await axios.post('http://localhost:4000/blockchain',data)
+        //validating the info - are the addresses exist in the DB?
+        const q1 = {publicKey:this.state.fromAddress};
+        const q2 = {publicKey:this.state.toAddress};
+        await axios.post('http://localhost:4000/isuserexist',q1)
             .then(res=>{
-                this.setState({
-                    chain:res.data.chain,
-                    difficulty: res.data.difficulty,
-                    pendingTransactions: res.data.pendingTransactions,
-                    miningReward: res.data.miningReward,
-                })
+                console.log("this.state.fromAddress",this.state.fromAddress);
+                console.log("res.data1=",res.data);
+                if(res.data === true){
+                    axios.post('http://localhost:4000/isuserexist',q2)
+                            .then(res=>{
+                                console.log("res.data2=",res.data);
+                                if(res.data ===true){
+                                    axios.post('http://localhost:4000/blockchain',data)
+                                    .then(res=>{
+                                        console.log("res.data3=",res.data);
+                                        this.setState({
+                                            chain:res.data.chain,
+                                            difficulty: res.data.difficulty,
+                                            pendingTransactions: res.data.pendingTransactions,
+                                            miningReward: res.data.miningReward,
+                                        })
+                                    })
+                                    .catch(err=>console.error(err))
+                                }
+                                else{
+                                    console.log("TX not valid");
+                                }
+                            })
+                }
+                else{
+                    console.log("TX not valid");
+                }
             })
-            .catch(err=>console.error(err))
     }
 
 
@@ -154,6 +177,7 @@ export default class Blockchain extends Component {
                     </div>
                     <h4 style={{color:'white'}}>Total pending TXs: {this.state.pendingTransactions.length}</h4>
                     <h4 style={{color:'white'}}>* You need at least 3 TXs to the mining</h4>
+                    <h4 style={{color:'white'}}>* Pay attention that if the TX is not valid, it will not be added to the blockchain</h4>
                 </div>
             )
         }
