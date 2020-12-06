@@ -39,7 +39,7 @@ const BlockchainSchema = new mongoose.Schema({
 BlockchainSchema.statics.blockchainCreator = async function(difficulty){
     const existed = await BlockchainModel.getExisting();
     if(existed === null){
-        return new BlockchainModel({difficulty});
+        return await new BlockchainModel({difficulty});
     }
     else{
         return existed;

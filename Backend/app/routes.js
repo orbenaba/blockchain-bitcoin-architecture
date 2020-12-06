@@ -150,19 +150,24 @@ function routes(app){
             res.status(400).send({message:"All fields are required - toAddress, fromAddress, amount !"})
             return;
         }
-        if(fromAddress === toAddress){
+        /*if(fromAddress === toAddress){
             res.status(400).send({message:"You can't transfer money to yourself"});
             return;
         }
         if(amount < 0){
             res.status(400).send({message: "HA".repeat(10)+ " Try harder !"});
             return;
-        }
+        }*/
         //Adding here validation
-        let chain = await BlockchainModel.blockchainCreator({difficulty:5});
+        /**
+ *          const data = await MinerModel.addMiner(req.body.name, req.body.money)
+            res.send(data)
+         */
+        let chain = await BlockchainModel.blockchainCreator(4);
         //Note that the data is saved by the addTransaction func !
         await chain.addTransaction(fromAddress, toAddress, amount);
-        res.send({message:"Transaction added to the chain!"})
+        chain = await chain.refresh();
+        res.send(chain)
         console.log('[+] TX added to the chain !');
     })
 
@@ -204,9 +209,9 @@ function routes(app){
     })
     
     
-    router.delete('/blockchain',(req, res)=>{
+    router.delete('/blockchain',async (req, res)=>{
         try{
-            BlockchainModel.deleteIt();
+            await BlockchainModel.deleteIt();
             console.log('[+] Blockchain deleted successfully !');
             res.send({message: 'Blockchain deleted successfully'})
         }

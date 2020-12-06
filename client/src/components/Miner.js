@@ -36,7 +36,6 @@ export default class Miner extends Component {
     }
 
     async deleteMiner(e){
-        console.log("HI");
         await axios.delete('http://localhost:4000/miner')
             .then(res=>{
                 this.setState({publicKey:""});
@@ -104,9 +103,9 @@ export default class Miner extends Component {
                             </div>
                         </div>
                         <button type="submit" className="btn btn-primary a-btn-slide-text">
-                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        <span><strong>Delete Miner</strong></span>            
-                    </button>      
+                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            <span><strong>Delete Miner</strong></span>            
+                        </button>      
                     </form>          
                  </div>
                 </div>
