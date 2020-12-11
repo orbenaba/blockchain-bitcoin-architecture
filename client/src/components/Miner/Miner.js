@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import './Miner.css'
 
 export default class Miner extends Component {
     constructor(props){
@@ -66,13 +65,12 @@ export default class Miner extends Component {
         if(this.state.publicKey === ''){
             return (
                 <div>
-                    <h1>
-                        Create Miner
-                    </h1>
+                    <h1 className="glow">Create Miner</h1>
                     <div>
                         <form onSubmit={this.onSubmit}>
-                            <input type="text" name={this.state.name} className="formStyle" placeholder="Name (required)" required onChange={e => this.onNameChange(e.target.value)}/>
-                            <input type="number" name={this.state.money} className="formStyle" placeholder="Initial amount (required)" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                            <input type="text" name={this.state.name} className="formStyle" placeholder="Name" required onChange={e => this.onNameChange(e.target.value)}/>
+                            <input type="number" style={{width:'10rem'}} name={this.state.money} className="formStyle" placeholder="Amount" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                            <br></br>
                             <button type="submit" className="formButton">Create</button>
                         </form>
                     </div>
@@ -81,31 +79,30 @@ export default class Miner extends Component {
         }
         else{
             return (
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                 <div className="well">
                     <form onSubmit={this.deleteMiner} className="form-horizontal">
-                        <h2 className="text-center" style={{color:'white'}}>Hello {this.state.name}</h2>
+                        <h2 className="text-center glow">Hello {this.state.name}</h2>
                         <hr />
-                        <div className="form-group">
-                            <label for="Money" className="control-label col-sm-3" style={{color:'white'}}>Money:</label>
-                            <div className="form-control-static col-sm-7">
-                            <label style={{color:'white'}}>{this.state.money}</label>
+                        <div className="general" style={{fontSize:'2rem', marginLeft:'5rem'}}>
+                            <div className="form-group">
+                                <label for="Money" className="control-label col-sm-3">Money:</label>
+                                <div className="form-control-static col-sm-7">
+                                    <label>{this.state.money}</label>
+                                    <label className="JKC">JKC</label>
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-group">
-                            <label for="publicKey" className="control-label col-sm-3" style={{color:'white'}}>Public Key:</label>
-                            <div className="form-control-static col-sm-3">
-                                <label style={{color:'white'}}>{this.state.publicKey}</label>
+                            <div className="form-group">
+                                <label for="publicKey" className="control-label col-sm-3">Public Key:</label>
+                                <div className="form-control-static col-sm-3" style={{fontSize:'1rem'}}>
+                                    <label>{this.state.publicKey}</label>
+                                </div>
                             </div>
-                            <label for="privateKey" className="control-label col-sm-1" style={{color:'white'}}>Private Key:</label>
-                            <div className="form-control-static col-sm-3">
-                            <label style={{color:'white'}}>{this.state.privateKey}</label>
-                            </div>
-                        </div>
-                        <button type="submit" className="btn btn-primary a-btn-slide-text">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span><strong>Delete Miner</strong></span>            
-                        </button>      
+                            <button type="submit" className="btn btn-primary a-btn-slide-text">
+                                <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                <span><strong>Delete Miner</strong></span>            
+                            </button>
+                        </div>      
                     </form>          
                  </div>
                 </div>

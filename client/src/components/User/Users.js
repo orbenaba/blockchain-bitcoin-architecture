@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 
+
  const User = props =>(
      <tr style={{color:'white'}}>
         <td>{props.userParam.name}</td>
         <td>{props.userParam.money}</td>
         <td>{props.userParam.publicKey}</td>
-        <td>{props.userParam.privateKey}</td>
     </tr>
  )
 
@@ -87,13 +87,12 @@ export default class Users extends Component {
         if(this.state.oldUsers.length !== 0){
             return (           
                 <div>
-                    <h1>
-                        Add user
-                    </h1>
+                    <h1 className="glow">users</h1>
                     <div>
-                        <form onSubmit={this.onSubmit}>
-                            <input type="text" name={this.state.name} className="formStyle" placeholder="Name (required)" required onChange={e => this.onNameChange(e.target.value)}/>
-                            <input type="number" name={this.state.money} className="formStyle" placeholder="Initial amount (required)" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                        <form onSubmit={this.onSubmit} >
+                            <input type="text" name={this.state.name} className="formStyle" placeholder="Name" required onChange={e => this.onNameChange(e.target.value)}/>
+                            <input type="number" style={{width:'10rem'}} name={this.state.money} className="formStyle" placeholder="Amount" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                            <br></br>
                             <button type="submit" className="formButton">Create</button>
                         </form>
                     </div>
@@ -106,7 +105,6 @@ export default class Users extends Component {
                                     <th>Name</th>
                                     <th>Money</th>
                                     <th>Wallet</th>
-                                    <th>private key</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -123,16 +121,15 @@ export default class Users extends Component {
         else{
             return(
                 <div>
-                <h1>
-                    Add user
-                </h1>
-                <div>
-                    <form onSubmit={this.onSubmit}>
-                        <input type="text" name={this.state.name} className="formStyle" placeholder="Name (required)" required onChange={e => this.onNameChange(e.target.value)}/>
-                        <input type="number" name={this.state.money} className="formStyle" placeholder="Initial amount (required)" required onChange={e =>this.onMoneyChange(e.target.value)}/>
-                        <button type="submit" className="formButton">Create</button>
-                    </form>
-                </div>
+                    <h1 className="glow">Create user</h1>
+                    <div>
+                        <form onSubmit={this.onSubmit} >
+                            <input type="text" name={this.state.name} className="formStyle" placeholder="Name" required onChange={e => this.onNameChange(e.target.value)}/>
+                            <input type="number" style={{width:'10rem'}} name={this.state.money} className="formStyle" placeholder="Amount" required onChange={e =>this.onMoneyChange(e.target.value)}/>
+                            <br></br>
+                            <button type="submit" className="formButton">Create</button>
+                        </form>
+                    </div>
                 </div>
             )
         }

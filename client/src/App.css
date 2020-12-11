@@ -4,9 +4,106 @@
 
 
 .BG{
-    background-image: url('./joker.jpg');
+    background-image: url('./Images/joker.jpg');
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     height: 55rem;
+}
+
+.glow{
+    font-family: fantasy;
+    text-transform: capitalize;
+    font-size: 5rem;
+    color: white;
+    padding: 80px;
+    text-shadow:
+                1px 1px 0px black,
+                -3px -0 25px red,
+                3px 0px 3px white,
+                0px 0px 15px white,
+                15px 10px 10px black,
+                0 0 40px blue,
+                0 0 40px green,
+                0 0 60px orangered,
+                0 0 80px yellow,
+                0 0 80px yellowgreen,
+                0 0 100px azure,
+                0 0 150px purple
+     }
+
+/*USed for Miner&User forms*/
+.formStyle{
+    background-color: red;
+    width: 17rem;
+    margin-left: 5rem;
+    margin-bottom: 5rem;
+    border-bottom-width:0.3rem;
+    border-bottom-style: solid;
+    border-bottom-color: orange;
+    border-top-style: none; 
+    border-right-style: none; 
+    border-left-style: none;
+    font-size: 1.5rem;
+    color: white;
+} 
+.formButton {
+    background-color:orange;
+    display:inline-block;
+    color:red;
+    margin-bottom: 5rem;
+    font-size:28px;
+    font-weight: 500;
+    padding:6px 24px;
+    margin-left: 5rem;
+    text-decoration:none;
+}
+
+.formButton:hover {
+    background-color: #27aea7;
+}
+
+.formButton:active {
+    position:relative;
+    top:3px;
+}
+
+input:focus {
+outline: none;
+}
+
+::-webkit-input-placeholder {
+    color: #ecf0f1;
+}
+
+:-moz-placeholder { 
+    color: #ecf0f1;  
+}
+
+::-moz-placeholder { 
+    color: #ecf0f1;  
+}
+
+:-ms-input-placeholder {  
+    color: #ecf0f1;  
+}
+
+a.btn:hover {
+    -webkit-transform: scale(1.1);
+    -moz-transform: scale(1.1);
+    -o-transform: scale(1.1);
+}
+a.btn {
+    -webkit-transform: scale(0.8);
+    -moz-transform: scale(0.8);
+    -o-transform: scale(0.8);
+    -webkit-transition-duration: 0.5s;
+    -moz-transition-duration: 0.5s;
+    -o-transition-duration: 0.5s;
+}
+
+
+/*Special font for JKC notation*/
+.JKC{
+    font-family: monospace;
 }

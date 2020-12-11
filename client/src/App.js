@@ -5,10 +5,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
  * Import here all the components
  */
 import Navbar from './components/Navbar';
-import Blockchain from './components/Blockchain';
-import Users from './components/Users';
-import Home from './components/Home.js';
-import Miner from './components/Miner';
+import Blockchain from './components/Blockchain/Blockchain';
+import Users from './components/User/Users';
+import Home from './components/Home/Home';
+import Miner from './components/Miner/Miner';
 import './App.css'
 
 /**
