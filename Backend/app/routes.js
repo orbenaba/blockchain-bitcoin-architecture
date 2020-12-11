@@ -22,7 +22,7 @@ function routes(app){
     app.get('/', (req, res)=>{
         console.log("[+] Main page loaded");
        // res.json({message: "Welcome to j00k3r c0in!"});
-       res.sendFile(path.resolve(__dirname,'client','build','index.html'))
+       res.sendFile(path.resolve(__dirname,'public','build','index.html'))
     })
     /**
      * Displaying the main page of the website, 

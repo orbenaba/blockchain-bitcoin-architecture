@@ -1,21 +1,4 @@
-body {
-    background-color: #3D37E1;
-    font-family: source-sans-pro, sans-serif;
-  }
-  
-  h1 {
-    margin-left: auto;
-    margin-top: 50px;
-    text-align: center;
-    font-weight: 100;
-    font-size: 2.8em;
-    color: #ffffff;
-  }
-  
-  div {
-    width: 500px;
-    margin: auto;
-  }
+/*
   
   .formStyle { 
     background-color: #66B2FF;
@@ -55,21 +38,21 @@ body {
       top:3px;
   }
   
-  /*To remove the outline that appears on clicking the input textbox*/
+  //To remove the outline that appears on clicking the input textbox
   input:focus {
     outline: none;
   }
   
-  /* To format the placeholder text color */
+  // To format the placeholder text color
   ::-webkit-input-placeholder {
      color: #ecf0f1;
   }
   
-  :-moz-placeholder { /* Firefox 18- */
+  :-moz-placeholder { // Firefox 18
      color: #ecf0f1;  
   }
   
-  ::-moz-placeholder {  /* Firefox 19+ */
+  ::-moz-placeholder {  // Firefox 19+
      color: #ecf0f1;  
   }
   
@@ -89,4 +72,4 @@ a.btn {
     -webkit-transition-duration: 0.5s;
     -moz-transition-duration: 0.5s;
     -o-transition-duration: 0.5s;
-}
+}*/

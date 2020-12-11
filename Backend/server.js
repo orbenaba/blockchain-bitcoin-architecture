@@ -1,31 +1,46 @@
 //Routing
-const express = require('express');
+/*const express = require('express');
 const routes =  require('./app/routes');
 const {json, urlencoded} = require('body-parser');
 const cors = require('cors');
 const portscanner = require('portscanner');
 
 
-/**
- * DataBase connecting
- */
+//DB server
 const mongoose = require('mongoose');
 const db = require('../Schemas/keysToRemote').MongoURI;
 mongoose.connect(db, {useNewUrlParser: true})
 .then(console.log('[+] MongoDB connected ...'))
 .catch(err=> console.error(err));
 
-/**
- * P2P server
- */
+//P2P server
 const P2pserver = require('./app/p2p-server');
 const { BlockchainModel } = require('../Schemas/Blockchain');
-const {HTTPNumberizerModel, P2PNumberizerModel} = require('./app/Numberizer')
 
-/*async function main(){
+
+let P2PNumberizerModel = null;
+try{
+    P2PNumberizerModel = mongoose.model('P2PNumberizer', require('./app/Numberizer').P2PNumberizerSchmea);
+}catch(e){
+    P2PNumberizerModel = mongoose.model('P2PNumberizer');
+}
+
+
+let HTTPNumberizerModel = null;
+try{
+    HTTPNumberizerModel = mongoose.model('HTTPNumberizer', require('./app/Numberizer').HTTPNumberizerSchmea);
+}catch(e){
+    HTTPNumberizerModel = mongoose.model('HTTPNumberizer');
+}
+
+
+
+
+async function main(){
     //get the blockchain from the DB
     const blockchain = await BlockchainModel.blockchainCreator();
-    //declare the peer to peer server port
+    //declare the peer to peer server port`
+
     let P2P_PORT = await P2PNumberizerModel.getIndex();
     let HTTP_PORT = await HTTPNumberizerModel.getIndex();
     await portscanner.findAPortNotInUse([P2P_PORT,P2P_PORT+1000],'127.0.0.1')
@@ -53,7 +68,40 @@ const {HTTPNumberizerModel, P2PNumberizerModel} = require('./app/Numberizer')
                                             p2pserver.listen();                    
                                         })
                     })
-}*/
+}
+
+main();
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+//Routing
+const express = require('express');
+const routes =  require('./app/routes');
+const {json, urlencoded} = require('body-parser');
+const cors = require('cors');
+const portscanner = require('portscanner');
+
+
+/**
+ * DataBase connecting
+ */
+const mongoose = require('mongoose');
+const db = require('../Schemas/keysToRemote').MongoURI;
+mongoose.connect(db, {useNewUrlParser: true})
+.then(console.log('[+] MongoDB connected ...'))
+.catch(err=> console.error(err));
+
+const { BlockchainModel } = require('../Schemas/Blockchain');
 
 
 async function main(){

@@ -86,7 +86,7 @@ export default class Users extends Component {
     render() {
         if(this.state.oldUsers.length !== 0){
             return (           
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                     <h1>
                         Add user
                     </h1>
@@ -122,7 +122,7 @@ export default class Users extends Component {
         }
         else{
             return(
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                 <h1>
                     Add user
                 </h1>

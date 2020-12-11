@@ -1,0 +1,12 @@
+.app-container{
+    margin: auto;
+}
+
+
+.BG{
+    background-image: url('./joker.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 55rem;
+}

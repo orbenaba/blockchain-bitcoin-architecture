@@ -65,7 +65,7 @@ export default class Miner extends Component {
     render() {
         if(this.state.publicKey === ''){
             return (
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                     <h1>
                         Create Miner
                     </h1>

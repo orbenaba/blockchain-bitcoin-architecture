@@ -132,7 +132,7 @@ export default class Blockchain extends Component {
     render() {
         if(this.state.difficulty !== 0 && this.state.pendingTransactions.length >= 3){
             return (
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                 <h1>
                     Add transaction
                 </h1>
@@ -163,7 +163,7 @@ export default class Blockchain extends Component {
         }
         else if(this.state.difficulty!==0){
             return (
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                     <h1>
                         Add transaction (the blockchain will be created automatically)
                     </h1>
@@ -183,7 +183,7 @@ export default class Blockchain extends Component {
         }
         else{
             return (
-                <div style={{backgroundColor: 'blue',width: '100%',height: '2000px'}}>
+                <div>
                     <h1>
                         Add transaction (the blockchain will be created automatically)
                     </h1>

@@ -47,8 +47,6 @@ BlockchainSchema.statics.blockchainCreator = async function(difficulty){
 }
 
 
-
-
 /**
  * Hook function to fill the first genesis block when the blockchain is created
  * Used only and only for genesis block !!! other cases will be ignored
