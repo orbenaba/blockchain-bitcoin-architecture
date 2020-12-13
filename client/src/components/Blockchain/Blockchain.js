@@ -1,204 +1,178 @@
-import React, { Component } from 'react'
-import {Link} from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 
-export default class Blockchain extends Component {
-    constructor(props){
-        super(props);
-        this.onSubmit = this.onSubmit.bind(this);
-        this.deleteBlockchain= this.deleteBlockchain.bind(this);
+export default function Blockchain() {
+    //default values such as [],0, {} and '' are assigned
+    const [chain, setChain] = useState([]);
+    const [difficulty, setDifficulty] = useState(0);
+    const [pendingTransactions, setPendingTransactions] = useState([]);
+    const [miningReward, setMiningReward] = useState(100);
+    const [fromAddress, setFromAddress] = useState('');
+    const [toAddress, setToAddress] = useState('');
+    const [amount, setAmount] = useState(0);
+    const [miner, setMiner] = useState({});
+    const {userOptions, setUserOptions} = useState([]);
 
+    useEffect(() => {
 
-
-        this.state={
-            chain: [],
-            difficulty: 0,
-            pendingTransactions: [],
-            miningReward: 100,
-            fromAddress:'',
-            toAddress:'',
-            amount:0,
-            miner:{}
-        }
-    }
-    async componentDidMount(){
-        await axios.get('http://localhost:4000/blockchain')
-            .then(res=>{
-                if(typeof res.data.difficulty !== 'undefined'){
-                    this.setState({
-                        chain:res.data.chain,
-                        difficulty:res.data.difficulty,
-                        pendingTransactions:res.data.pendingTransactions,
-                        miningReward:res.data.miningReward
-                    })
-                    //check out the miner
-                    axios.get('http://localhost:4000/miner')
-                            .then(res=>{
-                                if(typeof res.data.name !== 'undefined'){
-                                    this.setState({
-                                        miner:res.data
-                                    })
-                                }
-                                //else - no miner created yet
-                            })
+        async function fetchData(){
+            const res = await axios.get('http://localhost:4000/blockchain')
+            //else - no blockchain created yet
+            if(typeof res.data.difficulty !== 'undefined'){
+                setChain(res.data.chain);
+                setDifficulty(res.data.difficulty);
+                setPendingTransactions(res.data.pendingTransactions);
+                setMiningReward(res.data.miningReward);
+                //check out the miner
+                //else - no miner created yet
+                const miner = await axios.get('http://localhost:4000/miner');
+                if(typeof miner.data.name !== 'undefined'){
+                    setMiner(res.data);
                 }
-                //else - no blockchain created yet
-            })
+                let users = await axios.get('http://localhost:4000/users');
+                for(let i = 0;i< users.length; i++){
+                    console.log("users[i] = ",users[i]);
+                    userOptions.push(<option key={i}>{users[i]}</option>)
+                }
+            }
+        }
+        fetchData();
+    }, []);
+    const onFromAddressChange = (fromAddress) =>{
+        setFromAddress(fromAddress);
     }
 
-    onFromAddressChange = (fromAddress) =>{
-        this.setState({fromAddress});
+    const onToAddressChange = (toAddress) =>{
+        setToAddress(toAddress);
     }
 
-    onToAddressChange = (toAddress) =>{
-        this.setState({toAddress});
+    const onAmountChange = (amount) =>{
+        setAmount(amount);
     }
 
-    onAmountChange = (amount) =>{
-        this.setState({amount});
-    }
-
-    async onSubmit(e){
+    const onSubmit = async(e)=>{
         await e.preventDefault();
         const data = {
-            amount: this.state.amount,
-            fromAddress: this.state.fromAddress,
-            toAddress: this.state.toAddress
+            amount: amount,
+            fromAddress: fromAddress,
+            toAddress: toAddress
         }
-        //validating the info - are the addresses exist in the DB?
-        const q1 = {publicKey:this.state.fromAddress};
-        const q2 = {publicKey:this.state.toAddress};
-        await axios.post('http://localhost:4000/isuserexist',q1)
-            .then(res=>{
-                console.log("this.state.fromAddress",this.state.fromAddress);
-                console.log("res.data1=",res.data);
-                if(res.data === true){
-                    axios.post('http://localhost:4000/isuserexist',q2)
-                            .then(res=>{
-                                console.log("res.data2=",res.data);
-                                if(res.data ===true){
-                                    axios.post('http://localhost:4000/blockchain',data)
-                                    .then(res=>{
-                                        console.log("res.data3=",res.data);
-                                        this.setState({
-                                            chain:res.data.chain,
-                                            difficulty: res.data.difficulty,
-                                            pendingTransactions: res.data.pendingTransactions,
-                                            miningReward: res.data.miningReward,
-                                        })
-                                    })
-                                    .catch(err=>console.error(err))
-                                }
-                                else{
-                                    console.log("TX not valid");
-                                }
-                            })
-                }
-                else{
-                    console.log("TX not valid");
-                }
-            })
+        //The fields of toAddress & fromAddress have already been validated
+        const res = await axios.post('http://localhost:4000/blockchain',data);
+        setChain(res.data.chain);
+        setDifficulty(res.data.difficulty);
+        setPendingTransactions(res.data.pendingTransactions);
+        setMiningReward(res.data.miningReward);
     }
 
-
-    async deleteBlockchain(e){
+    const deleteBlockchain = async(e)=>{
         await axios.delete('http://localhost:4000/blockchain')
+        setChain([]);
+        setDifficulty(0);
+        setPendingTransactions([]);
+        setMiningReward(100);
+        setFromAddress('');
+        setToAddress('');
+        setAmount(0);               
+    }
+
+    const minePendingTXs = async()=>{
+        axios.post('http://localhost:4000/mineblocks',miner)
             .then(res=>{
-                this.setState({
-                    chain: [],
-                    difficulty: 0,
-                    pendingTransactions: [],
-                    miningReward: 100,
-                    fromAddress:'',
-                    toAddress:'',
-                    amount:0                    
-                });
-            })
-            .catch(err=>{
                 
-                console.error(err);
             })
     }
 
-    minePendingTXs = async()=>{
-        axios.post('http://localhost:4000/mineblocks',this.state.miner)
-            .then(res=>{
-                this.setState({
+    if(difficulty !== 0 && pendingTransactions.length >= 3){
+        return (
+            <div>
+            <h1 className="glow">Add transaction</h1>
+            <div>
+            <form onSubmit={onSubmit}>
+                <input type="text" name={fromAddress} className="formStyle" placeholder="From address - public key" required onChange={e =>onFromAddressChange(e.target.value)}/>
+                <input type="text" name={toAddress} className="formStyle" placeholder="To address - public key" required onChange={e =>onToAddressChange(e.target.value)}/>
+                <input type="number" name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>
+                <button type="submit" className="formButton">Add</button>
+            </form>
+            </div>
+                <div>
+                    <h4>difficulty: {difficulty}</h4>
+                    <h4>Total blocks in the chain:{chain.length}</h4>
+                    <h4>Pending TXs: {pendingTransactions.length}</h4>
+                    <button type="submit" onClick={deleteBlockchain} className="btn btn-primary a-btn-slide-text">
+                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        <span><strong>Delete all the blockchain</strong></span>            
+                    </button>
 
-                })
-            })
+                    <button type="submit" onClick={minePendingTXs} className="btn btn-primary a-btn-slide-text">
+                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
+                    </button>
+                </div>
+            </div>
+        )
     }
+    else if(difficulty!==0){
+        return (
+            <div className="general">
+                <h1 className="glow">Add transaction</h1>
+                <div>
+                    <form onSubmit={onSubmit}>
+                        <label>From Address:</label>
+                        {/*<input type="select" name={fromAddress} className="formStyle" placeholder="From address - public key" required onChange={e => onFromAddressChange(e.target.value)}/>
+        */}
+                    <select name="fromAddress" style={{width:'10rem'}} value={fromAddress}>
+                    {userOptions}
+                    </select>             
+                        
+                        
+                        
+                        <br></br>
 
-    render() {
-        if(this.state.difficulty !== 0 && this.state.pendingTransactions.length >= 3){
-            return (
-                <div>
-                <h1>
-                    Add transaction
-                </h1>
-                <div>
-                <form onSubmit={this.onSubmit}>
-                    <input type="text" name={this.state.fromAddress} className="formStyle" placeholder="From address - public key (required)" required onChange={e => this.onFromAddressChange(e.target.value)}/>
-                    <input type="text" name={this.state.toAddress} className="formStyle" placeholder="To address - public key (required)" required onChange={e =>this.onToAddressChange(e.target.value)}/>
-                    <input type="number" name={this.state.amount} className="formStyle" placeholder="Amount (required)" required onChange={e => this.onAmountChange(e.target.value)}></input>
-                    <button type="submit" className="formButton">Add</button>
-                </form>
+                        <label style={{marginRight:'2.1rem'}}>To Address:</label>
+                        <input type="text" name={toAddress} className="formStyle" placeholder="To address - public key" required onChange={e =>onToAddressChange(e.target.value)}/>
+                        <br></br>
+                        
+                        <label style={{marginRight:'6rem'}}>Amount:</label>
+                        <input type="number" name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>                    
+                        
+    
+                        
+                        <button type="submit" className="formButton">Add</button>
+                    </form>
                 </div>
-                    <div>
-                        <h4 style={{color:'white'}}>difficulty: {this.state.difficulty}</h4>
-                        <h4 style={{color:'white'}}>Total blocks in the chain:{this.state.chain.length}</h4>
-                        <h4 style={{color:'white'}}>Pending TXs: {this.state.pendingTransactions.length}</h4>
-                        <button type="submit" onClick={this.deleteBlockchain} className="btn btn-primary a-btn-slide-text">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span><strong>Delete all the blockchain</strong></span>            
-                        </button>
-
-                        <button type="submit" onClick={this.minePendingTXs} className="btn btn-primary a-btn-slide-text">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
-                        </button>
-                    </div>
-                </div>
-            )
-        }
-        else if(this.state.difficulty!==0){
-            return (
+                <h4>Total pending TXs: {pendingTransactions.length}</h4>
+                <h4>* You need at least 3 TXs to start the mining</h4>
+            </div>
+        )
+    }
+    else{
+        return (
+            <div>
+                <h1 className="glow">Add transaction</h1>
                 <div>
-                    <h1>
-                        Add transaction (the blockchain will be created automatically)
-                    </h1>
-                    <div>
-                        <form onSubmit={this.onSubmit}>
-                            <input type="text" name={this.state.fromAddress} className="formStyle" placeholder="From address - public key (required)" required onChange={e => this.onFromAddressChange(e.target.value)}/>
-                            <input type="text" name={this.state.toAddress} className="formStyle" placeholder="To address - public key (required)" required onChange={e =>this.onToAddressChange(e.target.value)}/>
-                            <input type="number" name={this.state.amount} className="formStyle" placeholder="Amount (required)" required onChange={e => this.onAmountChange(e.target.value)}></input>
-                            <button type="submit" className="formButton">Add</button>
-                        </form>
-                    </div>
-                    <h4 style={{color:'white'}}>Total pending TXs: {this.state.pendingTransactions.length}</h4>
-                    <h4 style={{color:'white'}}>* You need at least 3 TXs to the mining</h4>
-                    <h4 style={{color:'white'}}>* Pay attention that if the TX is not valid, it will not be added to the blockchain</h4>
+                    <form onSubmit={onSubmit}>
+                        <label className="general">From Address:</label>
+                        <input type="text" name={fromAddress} className="formStyle" placeholder="From address - public key" required onChange={e => onFromAddressChange(e.target.value)}/>
+                        <br></br>
+                        <label className="general" style={{marginRight:'2.1rem'}}>To Address:</label>
+                        <input type="select" name={toAddress} className="formStyle" placeholder="To address - public key" required onChange={e =>onToAddressChange(e.target.value)}/>
+                        <br></br>
+                        <label className="general" style={{marginRight:'6rem'}}>Amount:</label>
+                         {/*<input type="select" name={this.state.amount} className="formStyle" placeholder="Amount" required onChange={e => this.onAmountChange(e.target.value)}></input>
+        */}
+                         <select name="fromAddress" value={fromAddress}>
+                         {/*users.map((e, key) => {
+                             return <option key={key} value={e.value}>{e.name}</option>;
+                         })*/}
+                     </select>
+                     
+                     
+                         <button type="submit" className="formButton">Add</button>
+                    </form>
                 </div>
-            )
-        }
-        else{
-            return (
-                <div>
-                    <h1>
-                        Add transaction (the blockchain will be created automatically)
-                    </h1>
-                    <div>
-                        <form onSubmit={this.onSubmit}>
-                            <input type="text" name={this.state.fromAddress} className="formStyle" placeholder="From address - public key (required)" required onChange={e => this.onFromAddressChange(e.target.value)}/>
-                            <input type="text" name={this.state.toAddress} className="formStyle" placeholder="To address - public key (required)" required onChange={e =>this.onToAddressChange(e.target.value)}/>
-                            <input type="number" name={this.state.amount} className="formStyle" placeholder="Amount (required)" required onChange={e => this.onAmountChange(e.target.value)}></input>
-                            <button type="submit" className="formButton">Add</button>
-                        </form>
-                    </div>
-                    <h4 style={{color:'white'}}>Total pending TXs: {this.state.pendingTransactions.length}</h4>
-                </div>
-            )
-        }
-        
+                <h4 className="general" style={{marginLeft:'5rem', fontSize:'2rem'}}>Total pending TXs: {pendingTransactions.length}</h4>
+            </div>
+        )
     }
 }

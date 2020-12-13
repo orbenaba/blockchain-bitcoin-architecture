@@ -1,17 +1,16 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 
-
  const User = props =>(
-     <tr style={{color:'white'}}>
+     <tr>
         <td>{props.userParam.name}</td>
-        <td>{props.userParam.money}</td>
-        <td>{props.userParam.publicKey}</td>
+        <td style={{color:'rgb(172, 224, 0)'}}>{props.userParam.money}</td>
+        <td style={{color:'yellow'}}>{props.userParam.publicKey}</td>
     </tr>
  )
 
-
 export default class Users extends Component {
+
     constructor(props){
         super(props);
 
@@ -30,7 +29,6 @@ export default class Users extends Component {
     componentDidMount(){
         axios.get('http://localhost:4000/users')
         .then(res=>{
-            console.log("data",res.data)
             this.setState({
                 oldUsers:res.data 
             })    
@@ -99,12 +97,12 @@ export default class Users extends Component {
     
     
                     <div>
-                        <table className="table">
-                            <thead className="thead-light">
+                        <table className="table general" style={{textAlign:'center'}}>
+                            <thead className="thead-dark">
                                 <tr>
                                     <th>Name</th>
-                                    <th>Money</th>
-                                    <th>Wallet</th>
+                                    <th style={{color:'rgb(172, 224, 0)'}}>Money<b className="JKC">(JKC)</b></th>
+                                    <th style={{color:'yellow'}}>Wallet</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -113,7 +111,7 @@ export default class Users extends Component {
                         </table>
                     </div>
                     <div>
-                        <button type="submit" onClick={this.deleteAll} className="formButton">Delete all users</button>
+                        <button type="submit" onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) this.deleteAll()}} className="formButton">Delete all users</button>
                     </div>
                 </div>
             )

@@ -81,7 +81,7 @@ export default class Miner extends Component {
             return (
                 <div>
                 <div className="well">
-                    <form onSubmit={this.deleteMiner} className="form-horizontal">
+                    <form onSubmit={()=>{if (window.confirm('Are you sure you wish to delete the miner?')) this.deleteMiner()}} className="form-horizontal">
                         <h2 className="text-center glow">Hello {this.state.name}</h2>
                         <hr />
                         <div className="general" style={{fontSize:'2rem', marginLeft:'5rem'}}>
