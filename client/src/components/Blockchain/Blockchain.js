@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from 'react'
+import DropdownList from 'react-widgets/lib/DropdownList'
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown'
+
+
+
+
+
+
+
+
 
 export default function Blockchain() {
     //default values such as [],0, {} and '' are assigned
@@ -11,32 +23,32 @@ export default function Blockchain() {
     const [toAddress, setToAddress] = useState('');
     const [amount, setAmount] = useState(0);
     const [miner, setMiner] = useState({});
-    const {userOptions, setUserOptions} = useState([]);
+    const [userOptions, setUserOptions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [fromName, setFromName] = useState('');
 
-    useEffect(() => {
-
-        async function fetchData(){
-            const res = await axios.get('http://localhost:4000/blockchain')
-            //else - no blockchain created yet
-            if(typeof res.data.difficulty !== 'undefined'){
-                setChain(res.data.chain);
-                setDifficulty(res.data.difficulty);
-                setPendingTransactions(res.data.pendingTransactions);
-                setMiningReward(res.data.miningReward);
-                //check out the miner
-                //else - no miner created yet
-                const miner = await axios.get('http://localhost:4000/miner');
-                if(typeof miner.data.name !== 'undefined'){
-                    setMiner(res.data);
-                }
-                let users = await axios.get('http://localhost:4000/users');
-                for(let i = 0;i< users.length; i++){
-                    console.log("users[i] = ",users[i]);
-                    userOptions.push(<option key={i}>{users[i]}</option>)
-                }
+    useEffect(async() => {
+        const res = await axios.get('http://localhost:4000/blockchain')
+        //else - no blockchain created yet
+        if(typeof res.data.difficulty !== 'undefined'){
+            setChain(res.data.chain);
+            setDifficulty(res.data.difficulty);
+            setPendingTransactions(res.data.pendingTransactions);
+            setMiningReward(res.data.miningReward);
+            //check out the miner
+            //else - no miner created yet
+            const miner = await axios.get('http://localhost:4000/miner');
+            if(typeof miner.data.name !== 'undefined'){
+                setMiner(res.data);
             }
         }
-        fetchData();
+        let users = (await axios.get('http://localhost:4000/users'));
+        let usersData = users.data;
+        for(let i = 0;i< usersData.length; i++){
+            //  userOptions.push(<option key={i}>{users[i]}</option>)
+            userOptions.push(usersData[i]);
+        }
+        setLoading(false);
     }, []);
     const onFromAddressChange = (fromAddress) =>{
         setFromAddress(fromAddress);
@@ -83,17 +95,64 @@ export default function Blockchain() {
             })
     }
 
+
+
+    if(loading){
+        return <h1 style={{color:'white'}}>L0@d1ng ....</h1>;
+    }
+
+    const handleSelectFromAddress=(e)=>{
+        setFromAddress(e);
+    }
+
+    
+    const handleSelectToAddress=(e)=>{
+        setToAddress(e);
+    }
+
+    let form = (<form onSubmit={onSubmit}>
+        <DropdownButton
+            alignRight
+            title={
+                fromAddress===''?<span>From Address</span>:<span style={{backgroundColor:'red'}}>{fromAddress.slice(1,40)}</span>
+            }
+            id="dropdown-item-button"
+            size="lg"
+            onSelect={handleSelectFromAddress}
+            >
+            {userOptions.map(u =>{
+                return <Dropdown.Item eventKey={u.publicKey}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
+            })}
+        </DropdownButton>
+        <br></br>
+        <DropdownButton
+            alignRight
+            title={
+                toAddress===''?<span>To Address</span>:<span style={{backgroundColor:'red'}}>{toAddress.slice(1,40)}</span>
+            }
+            id="dropdown-item-button"
+            size="lg"
+            onSelect={handleSelectToAddress}
+            >
+            {userOptions.map(u =>{
+                return <Dropdown.Item eventKey={u.publicKey}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
+            })}
+        </DropdownButton>
+        <br></br>
+            <label style={{marginRight:'6rem'}}>Amount:</label>
+            <input type="number" name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>                    
+            <button type="submit" className="formButton">Add</button>
+    </form>)
+
+
+
+
     if(difficulty !== 0 && pendingTransactions.length >= 3){
         return (
             <div>
             <h1 className="glow">Add transaction</h1>
             <div>
-            <form onSubmit={onSubmit}>
-                <input type="text" name={fromAddress} className="formStyle" placeholder="From address - public key" required onChange={e =>onFromAddressChange(e.target.value)}/>
-                <input type="text" name={toAddress} className="formStyle" placeholder="To address - public key" required onChange={e =>onToAddressChange(e.target.value)}/>
-                <input type="number" name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>
-                <button type="submit" className="formButton">Add</button>
-            </form>
+            {form}
             </div>
                 <div>
                     <h4>difficulty: {difficulty}</h4>
@@ -112,34 +171,13 @@ export default function Blockchain() {
             </div>
         )
     }
+
     else if(difficulty!==0){
         return (
             <div className="general">
                 <h1 className="glow">Add transaction</h1>
                 <div>
-                    <form onSubmit={onSubmit}>
-                        <label>From Address:</label>
-                        {/*<input type="select" name={fromAddress} className="formStyle" placeholder="From address - public key" required onChange={e => onFromAddressChange(e.target.value)}/>
-        */}
-                    <select name="fromAddress" style={{width:'10rem'}} value={fromAddress}>
-                    {userOptions}
-                    </select>             
-                        
-                        
-                        
-                        <br></br>
-
-                        <label style={{marginRight:'2.1rem'}}>To Address:</label>
-                        <input type="text" name={toAddress} className="formStyle" placeholder="To address - public key" required onChange={e =>onToAddressChange(e.target.value)}/>
-                        <br></br>
-                        
-                        <label style={{marginRight:'6rem'}}>Amount:</label>
-                        <input type="number" name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>                    
-                        
-    
-                        
-                        <button type="submit" className="formButton">Add</button>
-                    </form>
+                {form}
                 </div>
                 <h4>Total pending TXs: {pendingTransactions.length}</h4>
                 <h4>* You need at least 3 TXs to start the mining</h4>
@@ -151,25 +189,7 @@ export default function Blockchain() {
             <div>
                 <h1 className="glow">Add transaction</h1>
                 <div>
-                    <form onSubmit={onSubmit}>
-                        <label className="general">From Address:</label>
-                        <input type="text" name={fromAddress} className="formStyle" placeholder="From address - public key" required onChange={e => onFromAddressChange(e.target.value)}/>
-                        <br></br>
-                        <label className="general" style={{marginRight:'2.1rem'}}>To Address:</label>
-                        <input type="select" name={toAddress} className="formStyle" placeholder="To address - public key" required onChange={e =>onToAddressChange(e.target.value)}/>
-                        <br></br>
-                        <label className="general" style={{marginRight:'6rem'}}>Amount:</label>
-                         {/*<input type="select" name={this.state.amount} className="formStyle" placeholder="Amount" required onChange={e => this.onAmountChange(e.target.value)}></input>
-        */}
-                         <select name="fromAddress" value={fromAddress}>
-                         {/*users.map((e, key) => {
-                             return <option key={key} value={e.value}>{e.name}</option>;
-                         })*/}
-                     </select>
-                     
-                     
-                         <button type="submit" className="formButton">Add</button>
-                    </form>
+                    {form}
                 </div>
                 <h4 className="general" style={{marginLeft:'5rem', fontSize:'2rem'}}>Total pending TXs: {pendingTransactions.length}</h4>
             </div>
