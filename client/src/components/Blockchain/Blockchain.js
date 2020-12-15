@@ -9,7 +9,7 @@ import Loader from '../Shared/Loading';
 const Recap = props =>(
     <div style={{position:'absolute', left:'75rem', top:'15rem', backgroundColor:'black'}}>
         <h4>Difficulty: {props.difficulty}</h4>
-        <h4>Total blocks in the chain:{props.chainLength}</h4>
+        <h4>Total blocks in the chain: {props.chainLength}</h4>
         <h4>Pending TXs: {props.pendingTransactionsLength}</h4>
     </div>
 )
@@ -42,7 +42,7 @@ export default function Blockchain() {
             //else - no miner created yet
             const miner = await axios.get('http://localhost:4000/miner');
             if(typeof miner.data.name !== 'undefined'){
-                setMiner(res.data);
+                setMiner(miner.data);
             }
         }
         let users = (await axios.get('http://localhost:4000/users'));
@@ -111,8 +111,8 @@ export default function Blockchain() {
         setLoading(false);
         setFlag(false);
         //Here, the mining is completed
-        console.log("res.data.pendingTransactions = ",res.data.pendingTransactions);
         setPendingTransactions(res.data.pendingTransactions);
+        setChain(res.data.chain);
     }
 
 
@@ -201,7 +201,9 @@ export default function Blockchain() {
                 {form}
                 </div>
                 <h4>Total pending TXs: {pendingTransactions.length}</h4>
+                <h4>Total blocks in the chain: {chain.length} </h4>
                 <h4>* You need at least 3 TXs to start the mining</h4>
+
             </div>
         )
     }

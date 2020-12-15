@@ -175,8 +175,9 @@ function routes(app){
 
     router.post('/mineblocks',async(req,res)=>{
         //creating a new Blockchain with difficulty of 2, if the blockchain already existed then use it
+        console.log("In request = ",req.body);
         let chain = await BlockchainModel.blockchainCreator(2);
-        const miner = req.body.publicKey;
+        const miner = req.body;
         await chain.miningPendingTransactions(miner);
         console.log("chain efore = ",chain);
         chain = await chain.refresh();

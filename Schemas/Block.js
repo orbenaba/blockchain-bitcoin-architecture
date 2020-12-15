@@ -138,6 +138,7 @@ BlockSchema.methods.addTransaction = async function(fromAddress, toAddress, amou
             //await this.bloomFilter.add(fromAddress+toAddress+amount.toString()+timestamp.toString());
             await this.transactions.push(inserted);
         }
+        return flag;
     }catch(err){
         console.error(err);
     }

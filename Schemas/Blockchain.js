@@ -106,13 +106,11 @@ BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress,
          */
         let amon1 = parseInt(user1.money)-amount;
         let amon2 = parseInt(user2.money)+parseInt(amount);
-        console.log("amon2 = ",amon2)
         user1.money = amon1;
         user2.money = amon2;
         await user1.save();
         await user2.save();
-        console.log('user1 = ',user1);
-        console.log('user2 = ',user2);
+
         await this.pendingTransactions.push({fromAddress, toAddress, amount,externalModelType1: (op1 === 'U'?'Users':'Miners'),
                                             externalModelType2:(op2 === 'U'?'Users':'Miners')});
         await this.save();
@@ -131,7 +129,8 @@ BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress,
  * Boolean - True -> means 
  * }
  */
-BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress){
+BlockchainSchema.methods.miningPendingTransactions = async function(minerr){
+    const minerAddress = minerr.publicKey;
     //The miner collect at the most 3 transactions together and mining em
     while(true)
     {
@@ -139,8 +138,9 @@ BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress
         const pendedTX = await this.popFirstPendingTX();
         if(pendedTX === false){
             console.log('[!] There are no pending TXs !');
-            return;
+            return null;
         } 
+        //
         if(this.currentBlock === null){
             this.currentBlock = new BlockModel({transactions:[], prevHash:this.getLatestBlock().hash})
         }
@@ -151,6 +151,7 @@ BlockchainSchema.methods.miningPendingTransactions = async function(minerAddress
             await this.currentBlock.addTransaction(minerAddress, minerAddress,REWARD,'M','M');
             //Updating the DB appropriately
             let miner = await MinerModel.getMoneyByPublic(minerAddress);
+
             if(miner === null){
                 console.error("[-] Invalid miner address");
                 return;
@@ -294,7 +295,6 @@ BlockchainSchema.methods.refresh = async function(){
 BlockchainSchema.statics.getExisting = async()=>{
     try{
         const data = await BlockchainModel.find({});
-        console.log(data);
         if(data.length === 0) {
             return null;
         }
