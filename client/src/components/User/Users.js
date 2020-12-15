@@ -97,8 +97,11 @@ export default function Users() {
                         </tbody>
                     </table>
                 </div>
-                <div>
-                    <button type="submit" onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) deleteAll()}} className="formButton">Delete all users</button>
+                <div className="general">
+                    <button type="submit" style={{backgroundColor:'red', border:'none',fontSize:'1.5rem'}} className="btn btn-primary a-btn-slide-text" onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) deleteAll()}}>
+                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    <span><strong>Delete All</strong></span>            
+                    </button>
                 </div>
             </div>
         )

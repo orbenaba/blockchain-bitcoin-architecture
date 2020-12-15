@@ -101,14 +101,14 @@ function routes(app){
      * <----------- POST REQUESTS ----------->
      */
     //Adding new transaction
-    router.post('/transactions', (req,res)=>{
+    router.post('/transactions', async(req,res)=>{
         //Validating the request
         if(!req.body.fromAddress || !req.body.toAddress || !req.body.amount){
             res.status(400).send({message: "Content of TX cannot be empty"});
         }
         else{
             //Saving the TX
-            TransactionModel.addTransaction(req.body.fromAddress,req.body.toAddress,req.body.amount)
+            await TransactionModel.addTransaction(req.body.fromAddress,req.body.toAddress,req.body.amount)
             res.send({message:'TX added successfully !!!'})
         }
     })
@@ -158,23 +158,18 @@ function routes(app){
             res.status(400).send({message:"All fields are required - toAddress, fromAddress, amount !"})
             return;
         }
-        /*if(fromAddress === toAddress){
-            res.status(400).send({message:"You can't transfer money to yourself"});
-            return;
-        }
-        if(amount < 0){
-            res.status(400).send({message: "HA".repeat(10)+ " Try harder !"});
-            return;
-        }*/
-        //Adding here validation
-
 
         let chain = await BlockchainModel.blockchainCreator(2);
         //Note that the data is saved by the addTransaction func !
-        await chain.addTransaction(fromAddress, toAddress, amount);
-        chain = await chain.refresh();
-        res.send(chain)
-        console.log('[+] TX added to the chain !');
+        const result = await chain.addTransaction(fromAddress, toAddress, amount);
+        if(result === null){
+            res.send({error: 'Not enough money'});
+        }
+        else{
+            chain = await chain.refresh();
+            res.send(chain)
+            console.log('[+] TX added to the chain !');    
+        }
     })
 
 

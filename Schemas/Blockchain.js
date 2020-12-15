@@ -85,9 +85,24 @@ BlockchainSchema.methods.getLatestBlock = async function(){
  */
 BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress, amount, op1='U', op2='U'){
     try{
+        //First, we need to check if the TX is valid
+        const user1 = await UserModel.getMoneyByPublic(fromAddress);
+        if(user1 === null){
+            return null;
+        }
+        const user2 = await UserModel.getMoneyByPublic(toAddress);
+        if(user2 === null){
+            return null;
+        }
+        //then TX is invalid
+        if(user1.money < amount){
+            return null;
+        }
+        console.log("user1 = ",user1,"\nuser2 = ",user2);
         await this.pendingTransactions.push({fromAddress, toAddress, amount,externalModelType1: (op1 === 'U'?'Users':'Miners'),
                                             externalModelType2:(op2 === 'U'?'Users':'Miners')});
         await this.save();
+        return "blabla";
     }
     catch(err){ 
         console.error(err);

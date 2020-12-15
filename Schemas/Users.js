@@ -89,6 +89,7 @@ UserSchema.statics.displayAll = async ()=>{
     }
 }
 
+//Checking whether the public key exists
 UserSchema.statics.getMoneyByPublic = async(publicKey)=>{
     try{
         const user = await UserModel.findOne({publicKey});
@@ -118,9 +119,7 @@ UserSchema.statics.usersAmount = async function(){
 UserSchema.statics.isExist = async function(queried){
     try{
         //query by public key
-        console.log("GOT=>",queried.publicKey);
         const res = await UserModel.findOne({publicKey: queried.publicKey});
-        console.log("Res=",res);
         if(res !== null){
             return true;
         }

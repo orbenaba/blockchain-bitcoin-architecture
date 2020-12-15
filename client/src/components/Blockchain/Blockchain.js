@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import DropdownList from 'react-widgets/lib/DropdownList'
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 
-
-
-
-
-
+const Recap = props =>(
+    <div style={{position:'absolute', left:'75rem', top:'15rem', backgroundColor:'black'}}>
+        <h4>Difficulty: {props.difficulty}</h4>
+        <h4>Total blocks in the chain:{props.chainLength}</h4>
+        <h4>Pending TXs: {props.pendingTransactionsLength}</h4>
+    </div>
+)
 
 
 
@@ -21,11 +22,10 @@ export default function Blockchain() {
     const [miningReward, setMiningReward] = useState(100);
     const [fromAddress, setFromAddress] = useState('');
     const [toAddress, setToAddress] = useState('');
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState('');
     const [miner, setMiner] = useState({});
     const [userOptions, setUserOptions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [fromName, setFromName] = useState('');
 
     useEffect(async() => {
         const res = await axios.get('http://localhost:4000/blockchain')
@@ -45,36 +45,49 @@ export default function Blockchain() {
         let users = (await axios.get('http://localhost:4000/users'));
         let usersData = users.data;
         for(let i = 0;i< usersData.length; i++){
-            //  userOptions.push(<option key={i}>{users[i]}</option>)
             userOptions.push(usersData[i]);
         }
         setLoading(false);
     }, []);
-    const onFromAddressChange = (fromAddress) =>{
-        setFromAddress(fromAddress);
-    }
 
-    const onToAddressChange = (toAddress) =>{
-        setToAddress(toAddress);
-    }
 
     const onAmountChange = (amount) =>{
         setAmount(amount);
     }
 
     const onSubmit = async(e)=>{
-        await e.preventDefault();
-        const data = {
-            amount: amount,
-            fromAddress: fromAddress,
-            toAddress: toAddress
+        if(fromAddress === '' || toAddress === ''){
+            alert('You must select From Address & To Address fields !');
         }
-        //The fields of toAddress & fromAddress have already been validated
-        const res = await axios.post('http://localhost:4000/blockchain',data);
-        setChain(res.data.chain);
-        setDifficulty(res.data.difficulty);
-        setPendingTransactions(res.data.pendingTransactions);
-        setMiningReward(res.data.miningReward);
+        else if(fromAddress === toAddress){
+            alert('From address & To address must be different !');
+        }
+        else{
+            await e.preventDefault();
+            const data = {
+                amount: amount,
+                fromAddress: fromAddress,
+                toAddress: toAddress
+            }
+            //The fields of toAddress & fromAddress have already been validated
+            const res = await axios.post('http://localhost:4000/blockchain',data);
+            console.log('res.data = ',res.data);
+            console.log("res.data.error = ",res.data.error);
+            if(typeof res.data.error === 'undefined'){
+                setChain(res.data.chain);
+                setDifficulty(res.data.difficulty);
+                setPendingTransactions(res.data.pendingTransactions);
+                setMiningReward(res.data.miningReward);
+                setFromAddress('');
+                setToAddress('');
+                setAmount('');    
+            }
+            //There is no enough money ...
+            else{
+                alert(`${fromAddress.slice(1,30)} ...\n has no enough money to commit this tx`);
+            }
+            
+        }
     }
 
     const deleteBlockchain = async(e)=>{
@@ -85,7 +98,7 @@ export default function Blockchain() {
         setMiningReward(100);
         setFromAddress('');
         setToAddress('');
-        setAmount(0);               
+        setAmount('');               
     }
 
     const minePendingTXs = async()=>{
@@ -110,7 +123,7 @@ export default function Blockchain() {
         setToAddress(e);
     }
 
-    let form = (<form onSubmit={onSubmit}>
+    let form = (<form onSubmit={onSubmit} className="general">
         <DropdownButton
             alignRight
             title={
@@ -121,7 +134,7 @@ export default function Blockchain() {
             onSelect={handleSelectFromAddress}
             >
             {userOptions.map(u =>{
-                return <Dropdown.Item eventKey={u.publicKey}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
+                return <Dropdown.Item eventKey={u.publicKey} style={{backgroundColor:'blue', color:'white', textShadow:'none'}}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
             })}
         </DropdownButton>
         <br></br>
@@ -135,16 +148,13 @@ export default function Blockchain() {
             onSelect={handleSelectToAddress}
             >
             {userOptions.map(u =>{
-                return <Dropdown.Item eventKey={u.publicKey}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
+                return <Dropdown.Item eventKey={u.publicKey} style={{backgroundColor:'blue', color:'white', textShadow:'none'}}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
             })}
         </DropdownButton>
         <br></br>
-            <label style={{marginRight:'6rem'}}>Amount:</label>
-            <input type="number" name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>                    
+            <input type="number" value={amount} name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>                    
             <button type="submit" className="formButton">Add</button>
     </form>)
-
-
 
 
     if(difficulty !== 0 && pendingTransactions.length >= 3){
@@ -154,19 +164,20 @@ export default function Blockchain() {
             <div>
             {form}
             </div>
-                <div>
-                    <h4>difficulty: {difficulty}</h4>
-                    <h4>Total blocks in the chain:{chain.length}</h4>
-                    <h4>Pending TXs: {pendingTransactions.length}</h4>
-                    <button type="submit" onClick={deleteBlockchain} className="btn btn-primary a-btn-slide-text">
-                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        <span><strong>Delete all the blockchain</strong></span>            
-                    </button>
+                <div className="general">
+                    <Recap difficulty={difficulty} chainLength={chain.length} pendingTransactionsLength={pendingTransactions.length}></Recap>
+                    <div style={{position:'absolute', left:'75rem', top:'25rem'}}>
+                        <button type="submit" onClick={minePendingTXs} style={{marginTop:'3rem'}} className="btn btn-primary a-btn-slide-text">
+                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
+                        </button>
+                        <br></br>
+                        <button type="submit"  onClick={()=>{if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}} style={{marginTop:'3rem', marginBottom:'3rem'}} className="btn btn-primary a-btn-slide-text">
+                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            <span><strong>Delete all the blockchain</strong></span>            
+                        </button>
 
-                    <button type="submit" onClick={minePendingTXs} className="btn btn-primary a-btn-slide-text">
-                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                        <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
-                    </button>
+                    </div>
                 </div>
             </div>
         )

@@ -92,7 +92,7 @@ export default function Miner() {
                                 <label>{publicKey}</label>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-primary a-btn-slide-text">
+                        <button type="submit"  style={{backgroundColor:'red', border:'none'}} className="btn btn-primary a-btn-slide-text">
                             <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             <span><strong>Delete Miner</strong></span>            
                         </button>
