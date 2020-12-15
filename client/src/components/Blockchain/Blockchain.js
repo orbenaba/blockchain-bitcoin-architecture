@@ -28,7 +28,8 @@ export default function Blockchain() {
     const [miner, setMiner] = useState({});
     const [userOptions, setUserOptions] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    //flag is used to differentiate between Component loading & mining time
+    const [flag, setFlag] = useState(false);
     useEffect(async() => {
         const res = await axios.get('http://localhost:4000/blockchain')
         //else - no blockchain created yet
@@ -73,8 +74,7 @@ export default function Blockchain() {
             }
             //The fields of toAddress & fromAddress have already been validated
             const res = await axios.post('http://localhost:4000/blockchain',data);
-            console.log('res.data = ',res.data);
-            console.log("res.data.error = ",res.data.error);
+
             if(typeof res.data.error === 'undefined'){
                 setChain(res.data.chain);
                 setDifficulty(res.data.difficulty);
@@ -104,10 +104,15 @@ export default function Blockchain() {
     }
 
     const minePendingTXs = async()=>{
-        axios.post('http://localhost:4000/mineblocks',miner)
-            .then(res=>{
-                
-            })
+        //displaying some UI in the meantime of mining...
+        setFlag(true);
+        setLoading(true);
+        const res = await axios.post('http://localhost:4000/mineblocks',miner);
+        setLoading(false);
+        setFlag(false);
+        //Here, the mining is completed
+        console.log("res.data.pendingTransactions = ",res.data.pendingTransactions);
+        setPendingTransactions(res.data.pendingTransactions);
     }
 
 
@@ -123,7 +128,7 @@ export default function Blockchain() {
 
     if(loading){
         return (
-            <Loader></Loader>
+            <Loader flag={flag}></Loader>
         )
     }
 

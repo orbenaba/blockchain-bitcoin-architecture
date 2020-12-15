@@ -54,7 +54,7 @@ export default function Miner() {
 
     if(loading){
         return (
-            <Loader></Loader>
+            <Loader flag={false}></Loader>
         )
     }
 

@@ -174,10 +174,14 @@ function routes(app){
 
 
     router.post('/mineblocks',async(req,res)=>{
+        //creating a new Blockchain with difficulty of 2, if the blockchain already existed then use it
         let chain = await BlockchainModel.blockchainCreator(2);
         const miner = req.body.publicKey;
         await chain.miningPendingTransactions(miner);
-        res.send({message:"Block mined successfully"});
+        console.log("chain efore = ",chain);
+        chain = await chain.refresh();
+        console.log("chain after = ",chain);
+        res.send(chain);
     })
 
     //queried is public key

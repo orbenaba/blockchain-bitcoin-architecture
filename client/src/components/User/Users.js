@@ -78,7 +78,7 @@ export default function Users() {
     
     if(loading){
         return (
-            <Loader></Loader>
+            <Loader flag={false}></Loader>
         )
     }
 
@@ -102,7 +102,7 @@ export default function Users() {
                     </table>
                 </div>
                 <div className="general">
-                    <button type="submit" style={{backgroundColor:'red', border:'none',fontSize:'1.5rem'}} className="btn btn-primary a-btn-slide-text" onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) deleteAll()}}>
+                    <button type="submit" style={{backgroundColor:'red', border:'none',fontSize:'1.5rem', marginBottom:'5rem'}} className="btn btn-primary a-btn-slide-text" onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) deleteAll()}}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                     <span><strong>Delete All</strong></span>            
                     </button>
