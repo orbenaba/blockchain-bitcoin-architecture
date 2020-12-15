@@ -98,7 +98,21 @@ BlockchainSchema.methods.addTransaction = async function(fromAddress, toAddress,
         if(user1.money < amount){
             return null;
         }
-        console.log("user1 = ",user1,"\nuser2 = ",user2);
+        /**
+         * The TX is valid, just update the wallets ....
+         * Explanation:
+         * In this way, we defend from a critical problem - Double spending,
+         * Yes, this is the solution !
+         */
+        let amon1 = parseInt(user1.money)-amount;
+        let amon2 = parseInt(user2.money)+parseInt(amount);
+        console.log("amon2 = ",amon2)
+        user1.money = amon1;
+        user2.money = amon2;
+        await user1.save();
+        await user2.save();
+        console.log('user1 = ',user1);
+        console.log('user2 = ',user2);
         await this.pendingTransactions.push({fromAddress, toAddress, amount,externalModelType1: (op1 === 'U'?'Users':'Miners'),
                                             externalModelType2:(op2 === 'U'?'Users':'Miners')});
         await this.save();
@@ -233,8 +247,6 @@ BlockchainSchema.methods.replaceChain = async function(otherChain){
     this.chain = otherChain;
     await this.save();
 }
-
-
 
 /**
  * Re-retrieve the data from the DB 

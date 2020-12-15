@@ -1,5 +1,6 @@
 import {React, useEffect, useState} from 'react'
 import axios from 'axios';
+import Loader from '../Shared/Loading';
 
 const User = props =>(
     <tr>
@@ -19,10 +20,10 @@ export default function Users() {
     const [loading, setLoading] = useState(true);
 
     useEffect(async()=>{
-        const res = await axios.get('http://localhost:4000/users')
+        const res = await axios.get('http://localhost:4000/users');
         setOldUsers(res.data);
         setLoading(false);
-    })
+    },[])
 
 
     function onNameChange(name){
@@ -37,7 +38,8 @@ export default function Users() {
         const data = {name,money};
         await axios.post('http://localhost:4000/users',data)
             .then(res=>{
-                console.log(res)
+                //Clearing the form right after the Data has been added to the DB
+                document.formInput.reset();
                 setPublicKey('');
                 setPrivateKey('');
                 setName('');
@@ -65,17 +67,19 @@ export default function Users() {
     }
 
     let form = (<div>
-                    <form onSubmit={onSubmit} >
-                        <input type="text" name={name} className="formStyle" placeholder="Name" required onChange={e => onNameChange(e.target.value)}/>
-                        <input type="number" style={{width:'10rem'}} name={money} className="formStyle" placeholder="Amount" required onChange={e => onMoneyChange(e.target.value)}/>
+                    <form name="formInput" onSubmit={onSubmit} >
+                        <input type="text" name={name} className="formStyle" placeholder="Name" minLength="2" maxLength="30" required onChange={e => onNameChange(e.target.value)}/>
+                        <input type="number" style={{width:'10rem'}} name={money} className="formStyle" placeholder="Amount" required minLength="1" maxLength="12" onChange={e => onMoneyChange(e.target.value)}/>
                         <br></br>
                         <button type="submit" className="formButton">Create</button>
                     </form>
-                </div>)
+                </div>
+                )
     
-
     if(loading){
-        return <h1 style={{color:'white'}}>L0@d1ng ....</h1>;
+        return (
+            <Loader></Loader>
+        )
     }
 
     if(oldUsers.length !== 0){

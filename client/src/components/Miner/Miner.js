@@ -1,6 +1,7 @@
 import axios from 'axios';
-
 import {React,useState,useEffect} from 'react'
+import Loader from '../Shared/Loading';
+
 
 export default function Miner() {
     const [publicKey, setPublicKey] = useState('');
@@ -20,7 +21,7 @@ export default function Miner() {
                     }
                     setLoading(false);
                 })
-    })
+    },[])
 
     
     function onNameChange(name){
@@ -52,7 +53,9 @@ export default function Miner() {
     }
 
     if(loading){
-        return <h1 style={{color:'white'}}>L0@d1ng ....</h1>;
+        return (
+            <Loader></Loader>
+        )
     }
 
 
@@ -62,8 +65,8 @@ export default function Miner() {
                 <h1 className="glow">Create Miner</h1>
                 <div>
                     <form onSubmit={onSubmit}>
-                        <input type="text" name={name} className="formStyle" placeholder="Name" required onChange={e => onNameChange(e.target.value)}/>
-                        <input type="number" style={{width:'10rem'}} name={money} className="formStyle" placeholder="Amount" required onChange={e =>onMoneyChange(e.target.value)}/>
+                        <input type="text" name={name} className="formStyle" placeholder="Name" required minLength="2" maxLength="30" onChange={e => onNameChange(e.target.value)}/>
+                        <input type="number" style={{width:'10rem'}} name={money} className="formStyle" placeholder="Amount" minLength="1" maxLength="12" required minLength='1' maxLength='12' onChange={e =>onMoneyChange(e.target.value)}/>
                         <br></br>
                         <button type="submit" className="formButton">Create</button>
                     </form>

@@ -3,6 +3,8 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
+import Loader from '../Shared/Loading';
+
 
 const Recap = props =>(
     <div style={{position:'absolute', left:'75rem', top:'15rem', backgroundColor:'black'}}>
@@ -110,10 +112,6 @@ export default function Blockchain() {
 
 
 
-    if(loading){
-        return <h1 style={{color:'white'}}>L0@d1ng ....</h1>;
-    }
-
     const handleSelectFromAddress=(e)=>{
         setFromAddress(e);
     }
@@ -122,6 +120,13 @@ export default function Blockchain() {
     const handleSelectToAddress=(e)=>{
         setToAddress(e);
     }
+
+    if(loading){
+        return (
+            <Loader></Loader>
+        )
+    }
+
 
     let form = (<form onSubmit={onSubmit} className="general">
         <DropdownButton
@@ -172,7 +177,7 @@ export default function Blockchain() {
                             <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
                         </button>
                         <br></br>
-                        <button type="submit"  onClick={()=>{if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}} style={{marginTop:'3rem', marginBottom:'3rem'}} className="btn btn-primary a-btn-slide-text">
+                        <button type="submit" onClick={()=>{if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}} style={{marginTop:'3rem', marginBottom:'3rem', backgroundColor:'red', border:'none'}} className="btn btn-primary a-btn-slide-text">
                             <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             <span><strong>Delete all the blockchain</strong></span>            
                         </button>
