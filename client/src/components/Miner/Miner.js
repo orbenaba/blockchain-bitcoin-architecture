@@ -44,10 +44,10 @@ export default function Miner() {
         const data = {name,money};
         await axios.post('http://localhost:4000/miner',data)
             .then(res=>{
-                setPublicKey('');
-                setPrivateKey('');
-                setMoney(0);
-                setName('');
+                setPublicKey(res.data.publicKey);
+                setPrivateKey(res.data.privateKey);
+                setMoney(res.data.money);
+                setName(res.data.name);
             })
             .catch(err=>console.error(err))
     }
@@ -92,10 +92,10 @@ export default function Miner() {
                         <div className="form-group">
                             <label for="publicKey" className="control-label col-sm-3">Public Key:</label>
                             <div className="form-control-static col-sm-3" style={{fontSize:'1rem'}}>
-                                <label>{publicKey}</label>
+                                <label>0x{publicKey}</label>
                             </div>
                         </div>
-                        <button type="submit"  style={{backgroundColor:'red', border:'none'}} className="btn btn-primary a-btn-slide-text">
+                        <button type="submit" className="btn btn-danger delete-btn">
                             <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             <span><strong>Delete Miner</strong></span>            
                         </button>

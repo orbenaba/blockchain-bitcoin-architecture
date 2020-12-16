@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 /**
  * Import here all the components
  */
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar/Navbar';
 import Blockchain from './components/Blockchain/Blockchain';
 import Users from './components/User/Users';
 import Home from './components/Home/Home';

@@ -15,55 +15,59 @@
 }
 
 .glow{
-    font-family: fantasy;
+    font-family: cursive;
     text-transform: capitalize;
     font-size: 5rem;
-    color: white;
+    color: black;
     padding: 80px;
     text-shadow:
-                1px 1px 0px black,
-                -3px -0 25px red,
-                3px 0px 3px white,
-                0px 0px 15px white,
-                15px 10px 10px black,
-                0 0 40px blue,
-                0 0 40px green,
-                0 0 60px orangered,
-                0 0 80px yellow,
-                0 0 80px yellowgreen,
-                0 0 100px azure,
-                0 0 150px purple
-     }
+            1px 1px 0px rgba(64, 255, 0),
+            -3px -0 25px rgb(124,252,0),
+            3px 0px 3px rgb(127,255,0),
+            0px 0px 15px rgb(173,255,47),
+            15px 10px 10px rgb(0,100,0),
+            0 0 40px rgb(0,128,0),
+            0 0 40px rgb(34,139,34),
+            0 0 60px rgb(0,255,0),
+            0 0 80px rgb(50,205,50),
+            0 0 80px rgb(144,238,144),
+            0 0 100px rgb(0,255,127),
+            0 0 150px rgb(60,179,113)
+    }
 
-/*USed for Miner&User forms*/
+
+/*Used for Miner&User forms*/
 .formStyle{
-    background-color: red;
+    background-color: black;
+    border-color: rgba(64, 255, 0);
     width: 17rem;
     margin-left: 5rem;
     margin-bottom: 5rem;
     border-bottom-width:0.3rem;
-    border-bottom-style: solid;
-    border-bottom-color: orange;
+    border-bottom-style:groove;
     border-top-style: none; 
     border-right-style: none; 
     border-left-style: none;
+
     font-size: 1.5rem;
-    color: white;
+    color: rgba(64, 255, 0);
+    font-family: cursive;
 } 
 .formButton {
-    background-color:orange;
+    background-color:rgba(64, 255, 0);
     display:inline-block;
-    color:red;
     margin-bottom: 5rem;
     font-size:28px;
     font-weight: 500;
     padding:6px 24px;
     margin-left: 5rem;
     text-decoration:none;
+    font-family: cursive;
 }
 
 .formButton:hover {
-    background-color: #27aea7;
+    background-color: blue;
+    color: white;
 }
 
 .formButton:active {
@@ -109,4 +113,23 @@ a.btn {
 /*Special font for JKC notation*/
 .JKC{
     font-family: monospace;
+}
+
+.delete-btn{
+    font-family: cursive;
+    background-color: red;
+    border: none;
+    border-radius: 15px;
+    color: black;
+    font-size:x-large;
+    margin-bottom: 200px;
+    width: 200px;
+    height: 60px;
+}
+
+
+
+
+table, th, td {
+    border: 1px solid rgba(64, 255, 0);
 }

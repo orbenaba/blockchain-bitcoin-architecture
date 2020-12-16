@@ -4,13 +4,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown'
 import Loader from '../Shared/Loading';
+import './Blockchain.css'
+import {Link} from 'react-router-dom';
 
 
 const Recap = props =>(
-    <div style={{position:'absolute', left:'75rem', top:'15rem', backgroundColor:'black'}}>
-        <h4>Difficulty: {props.difficulty}</h4>
-        <h4>Total blocks in the chain: {props.chainLength}</h4>
-        <h4>Pending TXs: {props.pendingTransactionsLength}</h4>
+    <div style={{position:'absolute', left:'15rem', top:'45rem', backgroundColor:'black'}}>
+        <h3>Difficulty: {props.difficulty}</h3>
+        <h3>Total blocks in the chain: {props.chainLength}</h3>
+        <h3>Pending TXs: {props.pendingTransactionsLength}</h3>
     </div>
 )
 
@@ -41,7 +43,7 @@ export default function Blockchain() {
             //check out the miner
             //else - no miner created yet
             const miner = await axios.get('http://localhost:4000/miner');
-            if(typeof miner.data.name !== 'undefined'){
+            if(typeof miner.data.noMiner === 'undefined'){
                 setMiner(miner.data);
             }
         }
@@ -100,7 +102,7 @@ export default function Blockchain() {
         setMiningReward(100);
         setFromAddress('');
         setToAddress('');
-        setAmount('');               
+        setAmount('');
     }
 
     const minePendingTXs = async()=>{
@@ -134,82 +136,113 @@ export default function Blockchain() {
 
 
     let form = (<form onSubmit={onSubmit} className="general">
-        <DropdownButton
+        <div style={{ position:'relative', left:'-10rem'}}>
+            <DropdownButton
             alignRight
+            variant="success"
+            className="dropdown-link"
             title={
-                fromAddress===''?<span>From Address</span>:<span style={{backgroundColor:'red'}}>{fromAddress.slice(1,40)}</span>
+                fromAddress===''?<span className="dropdown-title">From Address</span>:<span style={{backgroundColor:'grey', color:'black'}}>0x{fromAddress.slice(1,40)}</span>
             }
             id="dropdown-item-button"
             size="lg"
             onSelect={handleSelectFromAddress}
             >
             {userOptions.map(u =>{
-                return <Dropdown.Item eventKey={u.publicKey} style={{backgroundColor:'blue', color:'white', textShadow:'none'}}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
+                return <Dropdown.Item eventKey={u.publicKey} style={{backgroundColor:'blue', color:'white', textShadow:'none'}}>{u.name + ' - 0x' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
             })}
-        </DropdownButton>
-        <br></br>
-        <DropdownButton
-            alignRight
-            title={
-                toAddress===''?<span>To Address</span>:<span style={{backgroundColor:'red'}}>{toAddress.slice(1,40)}</span>
-            }
-            id="dropdown-item-button"
-            size="lg"
-            onSelect={handleSelectToAddress}
-            >
-            {userOptions.map(u =>{
-                return <Dropdown.Item eventKey={u.publicKey} style={{backgroundColor:'blue', color:'white', textShadow:'none'}}>{u.name + ' - ' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
-            })}
-        </DropdownButton>
+            </DropdownButton>
+        </div>
+        <div style={{position:'relative', right:'-10rem'}}>
+            <DropdownButton
+                className="dropdown-link"
+                variant="success"
+                title={
+                    toAddress===''?<span className="dropdown-title">To Address</span>:<span style={{backgroundColor:'grey', color:'black'}}>0x{toAddress.slice(1,40)}</span>
+                }
+                id="dropdown-item-button"
+                size="lg"
+                onSelect={handleSelectToAddress}
+                >
+                {userOptions.map(u =>{
+                    return <Dropdown.Item eventKey={u.publicKey} style={{backgroundColor:'blue', color:'white', textShadow:'none'}}>{u.name + ' - 0x' + u.publicKey.slice(1,30) + ' ...'}</Dropdown.Item>
+                })}
+            </DropdownButton>
+        </div>
         <br></br>
             <input type="number" value={amount} name={amount} className="formStyle" placeholder="Amount" required onChange={e => onAmountChange(e.target.value)}></input>                    
-            <button type="submit" className="formButton">Add</button>
+            <button type="submit" className="formButton btn">Add</button>
     </form>)
 
 
-    if(difficulty !== 0 && pendingTransactions.length >= 3){
-        return (
-            <div>
-            <h1 className="glow">Add transaction</h1>
-            <div>
-            {form}
-            </div>
-                <div className="general">
-                    <Recap difficulty={difficulty} chainLength={chain.length} pendingTransactionsLength={pendingTransactions.length}></Recap>
-                    <div style={{position:'absolute', left:'75rem', top:'25rem'}}>
-                        <button type="submit" onClick={minePendingTXs} style={{marginTop:'3rem'}} className="btn btn-primary a-btn-slide-text">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span><strong>Mine 4 TXs in a shout(One for the miner)</strong></span>            
-                        </button>
-                        <br></br>
-                        <button type="submit" onClick={()=>{if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}} style={{marginTop:'3rem', marginBottom:'3rem', backgroundColor:'red', border:'none'}} className="btn btn-primary a-btn-slide-text">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span><strong>Delete all the blockchain</strong></span>            
-                        </button>
+    let deleteButton = (<button type="submit" 
+            onClick={()=>{
+            if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}}
+            style={{position:'absolute', top:'55rem',left:'100rem', color:'black',height:'3rem',fontSize:'1.4rem', border:'none'}}
+            className="btn btn-danger a-btn-slide-text">
+            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            <span><strong>Delete all the blockchain</strong></span>            
+            </button>);
 
+    if(difficulty !== 0 && pendingTransactions.length >= 3){
+        if(typeof miner.name !== 'undefined')
+        {
+            return (
+                <div className="text-center">
+                    <h1 className="glow">Add transaction</h1>
+                    <div>{form}</div>
+                    <div className="general">
+                        <Recap difficulty={difficulty} chainLength={chain.length} pendingTransactionsLength={pendingTransactions.length}></Recap>
+                            <button type="submit" onClick={minePendingTXs} style={{position:'absolute', top:'45rem',left:'50rem',color:'black', height:'8rem', fontSize:'1.8rem'}} className="btn btn-primary a-btn-slide-text">
+                                <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                <span><strong>Mine 4 TXs in a shout (One for the miner)</strong></span>            
+                            </button>
+                            <br></br>
+                            {deleteButton}
                     </div>
                 </div>
-            </div>
-        )
+            )
+        }
+        else{
+            return (
+                <div className="text-center">
+                    <h1 className="glow">Add transaction</h1>
+                    <div>{form}</div>
+                    <div className="general">
+                        <Recap difficulty={difficulty} chainLength={chain.length} pendingTransactionsLength={pendingTransactions.length}></Recap>
+                            <Link to="/miner">Click here to create a miner</Link>
+                            <br></br>
+                            {deleteButton}
+                    </div>
+                </div>
+            )
+        }
     }
 
     else if(difficulty!==0){
         return (
-            <div className="general">
+            <div className="general text-center">
                 <h1 className="glow">Add transaction</h1>
-                <div>
-                {form}
+                <div>{form}</div>
+                <div style={{position:'relative', right:'20rem'}}>
+                    <h4>Total pending TXs: {pendingTransactions.length}</h4>
+                    <h4>Total blocks in the chain: {chain.length} </h4>
+                    <h4>* You need at least 3 TXs to start the mining</h4>
                 </div>
-                <h4>Total pending TXs: {pendingTransactions.length}</h4>
-                <h4>Total blocks in the chain: {chain.length} </h4>
-                <h4>* You need at least 3 TXs to start the mining</h4>
-
+                <button type="submit" 
+                    onClick={()=>{
+                    if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}}
+                    style={{position:'relative',left:'20rem', color:'black',height:'3rem',fontSize:'1.4rem', border:'none'}}
+                    className="btn btn-danger a-btn-slide-text">
+                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    <span><strong>Delete all the blockchain</strong></span>            
+                </button>
             </div>
         )
     }
     else{
         return (
-            <div>
+            <div className="text-center">
                 <h1 className="glow">Add transaction</h1>
                 <div>
                     {form}
@@ -219,3 +252,13 @@ export default function Blockchain() {
         )
     }
 }
+
+
+/**<button type="submit" 
+            onClick={()=>{
+            if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}}
+            style={{position:'absolute', top:'55rem',left:'100rem', color:'black',height:'3rem',fontSize:'1.4rem', border:'none'}}
+            className="btn btn-danger a-btn-slide-text">
+            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            <span><strong>Delete all the blockchain</strong></span>            
+            </button> */

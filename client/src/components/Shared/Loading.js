@@ -6,15 +6,15 @@ export default function Loading(props) {
     {
         return (
             <div style={{width:'100%', height:'100%',display:'flex', justifyContent:'center', alignItems:'center'}}>
-                <Loader type="ThreeDots" color="#2BAD60" height="200" width="200"/>
+                <Loader type="ThreeDots" color="rgba(64, 255, 0)" height="200" width="200"/>
             </div>
        )
     }
     else{
         return (
             <div style={{width:'100%', height:'100%',display:'flex', justifyContent:'center', alignItems:'center'}}>
-                <h1 style={{color:'white'}}>Mining ...</h1>
-                <Loader type="ThreeDots" color="#2BAD60" height="200" width="200"/>
+                <h1 style={{color:'rgba(64, 255, 0)', fontFamily:'cursive'}}>Mining </h1>
+                <Loader type="ThreeDots" color="rgba(64, 255, 0)" height="200" width="200"/>
             </div>
        )
     }

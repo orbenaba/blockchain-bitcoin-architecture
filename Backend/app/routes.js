@@ -68,7 +68,7 @@ function routes(app){
         //Loading everything from the transactions Schema and send it as a response
         const data = await MinerModel.displayAll();
         if(data == null){
-            res.send({message:'No Miners'})
+            res.send({noMiners:'No Miners'})
         }
         else{
             console.log('Miner sent back ...');
@@ -175,13 +175,10 @@ function routes(app){
 
     router.post('/mineblocks',async(req,res)=>{
         //creating a new Blockchain with difficulty of 2, if the blockchain already existed then use it
-        console.log("In request = ",req.body);
         let chain = await BlockchainModel.blockchainCreator(2);
         const miner = req.body;
         await chain.miningPendingTransactions(miner);
-        console.log("chain efore = ",chain);
         chain = await chain.refresh();
-        console.log("chain after = ",chain);
         res.send(chain);
     })
 
