@@ -210,7 +210,7 @@ export default function Blockchain() {
                     <div>{form}</div>
                     <div className="general">
                         <Recap difficulty={difficulty} chainLength={chain.length} pendingTransactionsLength={pendingTransactions.length}></Recap>
-                            <Link to="/miner">Click here to create a miner</Link>
+                            <Link to="/miner" style={{position:'relative', left:'40px'}}>Click here to create a miner</Link>
                             <br></br>
                             {deleteButton}
                     </div>
@@ -252,13 +252,3 @@ export default function Blockchain() {
         )
     }
 }
-
-
-/**<button type="submit" 
-            onClick={()=>{
-            if (window.confirm('Are you sure you wish to delete the blockchain?')) deleteBlockchain()}}
-            style={{position:'absolute', top:'55rem',left:'100rem', color:'black',height:'3rem',fontSize:'1.4rem', border:'none'}}
-            className="btn btn-danger a-btn-slide-text">
-            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-            <span><strong>Delete all the blockchain</strong></span>            
-            </button> */

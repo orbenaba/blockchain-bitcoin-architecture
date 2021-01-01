@@ -115,22 +115,6 @@ UserSchema.statics.usersAmount = async function(){
     }
 }
 
-//queried is public key
-UserSchema.statics.isExist = async function(queried){
-    try{
-        //query by public key
-        const res = await UserModel.findOne({publicKey: queried.publicKey});
-        if(res !== null){
-            return true;
-        }
-        return false;
-    }catch(err){
-        console.error(err);
-    }
-}
-
-
-
 const UserModel = mongoose.model('Users', UserSchema);
 
 module.exports = {UserModel, UserSchema};

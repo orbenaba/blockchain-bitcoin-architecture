@@ -90,7 +90,7 @@ export default function Users() {
                 <h1 className="glow text-center">users</h1>
                 {form}
                 <div>
-                    <button type="submit" className="btn btn-danger delete-btn" style={{marginBottom:'3rem', marginLeft:'100rem'}} onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) deleteAll()}}>
+                    <button type="submit" className="btn btn-danger delete-btn" style={{marginBottom:'3rem',marginTop:'-6rem',position:'relative',left:'45rem'}} onClick={()=>{if (window.confirm('Are you sure you wish to delete all the users?')) deleteAll()}}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                     <span><strong>Delete All</strong></span>            
                     </button>

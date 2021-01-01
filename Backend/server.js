@@ -89,8 +89,6 @@ const express = require('express');
 const routes =  require('./app/routes');
 const {json, urlencoded} = require('body-parser');
 const cors = require('cors');
-const portscanner = require('portscanner');
-
 
 /**
  * DataBase connecting
@@ -100,8 +98,6 @@ const db = require('../Schemas/keysToRemote').MongoURI;
 mongoose.connect(db, {useNewUrlParser: true})
 .then(console.log('[+] MongoDB connected ...'))
 .catch(err=> console.error(err));
-
-const { BlockchainModel } = require('../Schemas/Blockchain');
 
 
 async function main(){

@@ -77,31 +77,27 @@ export default function Miner() {
     else{
         return (
             <div>
-            <div className="well">
-                <form onSubmit={()=>{if (window.confirm('Are you sure you wish to delete the miner?')) deleteMiner()}} className="form-horizontal">
-                    <h2 className="text-center glow">Hello {name}</h2>
-                    <hr />
-                    <div className="general" style={{fontSize:'2rem', marginLeft:'5rem'}}>
-                        <div className="form-group">
-                            <label for="Money" className="control-label col-sm-3">Money:</label>
-                            <div className="form-control-static col-sm-7">
-                                <label>{money}</label>
-                                <label className="JKC">JKC</label>
-                            </div>
+                <h2 className="text-center glow">Hello {name}</h2>
+                <hr />
+                <div className="general" style={{fontSize:'2rem', marginLeft:'5rem'}}>
+                    <div className="form-group">
+                        <label for="Money" className="control-label col-sm-3">Money:</label>
+                        <div className="form-control-static col-sm-7">
+                            <label>{money}</label>
+                            <label className="JKC">JKC</label>
                         </div>
-                        <div className="form-group">
-                            <label for="publicKey" className="control-label col-sm-3">Public Key:</label>
-                            <div className="form-control-static col-sm-3" style={{fontSize:'1rem'}}>
-                                <label>0x{publicKey}</label>
-                            </div>
+                    </div>
+                    <div className="form-group">
+                        <label for="publicKey" className="control-label col-sm-3">Public Key:</label>
+                        <div className="form-control-static col-sm-3" style={{fontSize:'1rem'}}>
+                            <label>0x{publicKey}</label>
                         </div>
-                        <button type="submit" className="btn btn-danger delete-btn">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span><strong>Delete Miner</strong></span>            
-                        </button>
-                    </div>      
-                </form>          
-             </div>
+                    </div>
+                    <button type="button" onClick={()=>{if (window.confirm('Are you sure you wish to delete the miner?')) deleteMiner()}} className="btn btn-danger delete-btn">
+                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                        <span><strong>Delete Miner</strong></span>            
+                    </button>
+                </div>      
             </div>
         )
     }
