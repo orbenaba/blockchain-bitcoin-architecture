@@ -1,11 +1,10 @@
-.dropdown-link a{
-    background-color: grey !important;
-    color: rgba(64, 255, 0) !important;
-    font-size:larger;
+.dropdown-link a {
+  background-color: grey !important;
+  color: rgba(64, 255, 0) !important;
+  font-size: larger;
 }
 
-
-.dropdown-title{
-    color: black !important;
-    font-size: x-large !important;
+.dropdown-title {
+  color: black !important;
+  font-size: x-large !important;
 }

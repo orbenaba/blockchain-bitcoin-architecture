@@ -8,7 +8,7 @@
   border-radius: 40px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
- 
+
 #navigation-bar ul {
   border-radius: 4px;
   overflow: hidden;
@@ -32,7 +32,7 @@
   transition: all 0.3s ease;
 }
 #navigation-bar a:hover {
-  color: rgb(0,0,255);
+  color: rgb(0, 0, 255);
 }
 #navigation-bar a::before {
   content: "";
@@ -42,13 +42,13 @@
   left: 50%;
   bottom: 0;
   height: 6px;
-  background-color: rgb(0,0,255);
+  background-color: rgb(0, 0, 255);
 }
 #navigation-bar a:hover::before {
   right: 0;
   left: 0;
 }
- 
+
 li {
-	list-style: none;
+  list-style: none;
 }
